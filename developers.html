@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PartyKeys Protocol — Developer Documentation</title>
+<meta name="description" content="Open-source MIDI + LED lighting protocol for PartyKeys keyboards.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff;
+    --bg-subtle: #fafafa;
+    --bg-code: #f6f8fa;
+    --bg-callout: #f7f5ff;
+    --border: #e5e7eb;
+    --border-strong: #d1d5db;
+    --text: #111827;
+    --text-muted: #6b7280;
+    --text-soft: #9ca3af;
+    --link: #7c3aed;
+    --link-hover: #6d28d9;
+    --brand: #7c3aed;
+    --brand-soft: #ede9fe;
+    --brand-light: #f5f3ff;
+    --accent-amber: #f59e0b;
+    --accent-blue: #3b82f6;
+    --code-bg: #0f172a;
+    --radius: 10px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+  }
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+  body {
+    font-family: var(--font-sans);
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.65;
+    font-size: 15.5px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  a { color: var(--link); text-decoration: none; transition: color .15s; }
+  a:hover { color: var(--link-hover); }
+
+  /* Header */
+  header.topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,.85);
+    backdrop-filter: saturate(180%) blur(16px);
+    -webkit-backdrop-filter: saturate(180%) blur(16px);
+    border-bottom: 1px solid var(--border);
+    height: 60px; display: flex; align-items: center; padding: 0 28px;
+  }
+  .topbar-inner { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1080px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; color: var(--text); letter-spacing: -0.01em; }
+  .brand-logo { width: 32px; height: 32px; flex-shrink: 0; display: block; }
+  .brand-name span { color: var(--text-muted); font-weight: 500; margin-left: 4px; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
+  .lang-select {
+    font-family: var(--font-sans); font-size: 13px; font-weight: 500;
+    padding: 6px 26px 6px 11px;
+    border: 1px solid var(--border); border-radius: 7px;
+    background-color: white; color: var(--text);
+    cursor: pointer; transition: all .15s;
+    -webkit-appearance: none; -moz-appearance: none; appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M3 4.5L6 8L9 4.5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat; background-position: right 8px center; background-size: 11px;
+  }
+  .lang-select:hover { border-color: var(--border-strong); background-color: var(--bg-subtle); }
+  .lang-select:focus { outline: 2px solid var(--brand-soft); outline-offset: 1px; border-color: var(--brand); }
+  .github-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--text); color: white; padding: 7px 13px; border-radius: 7px;
+    font-size: 13px; font-weight: 600; transition: opacity .15s;
+  }
+  .github-btn:hover { color: white; opacity: .88; }
+  .github-btn svg { width: 15px; height: 15px; }
+
+  /* Layout: 2-column */
+  .layout {
+    max-width: 1080px; margin: 0 auto;
+    display: grid; grid-template-columns: 220px minmax(0, 1fr);
+    gap: 48px; padding: 0 28px;
+  }
+  aside.sidebar {
+    position: sticky; top: 76px;
+    height: calc(100vh - 92px); overflow-y: auto;
+    padding: 28px 14px 28px 0;
+    border-right: 1px solid var(--border);
+  }
+  .sidebar-section { margin-bottom: 20px; }
+  .sidebar-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-soft);
+    margin-bottom: 6px; padding-left: 10px;
+  }
+  .sidebar-link {
+    display: block; padding: 5px 10px; border-radius: 6px;
+    color: var(--text-muted); font-size: 14px; font-weight: 500;
+    transition: all .12s; border-left: 2px solid transparent; margin-left: -2px;
+  }
+  .sidebar-link:hover { color: var(--text); background: var(--bg-subtle); }
+  .sidebar-link.active { color: var(--brand); background: var(--brand-light); border-left-color: var(--brand); font-weight: 600; }
+  .sidebar-sublink {
+    display: block; padding: 3px 10px 3px 22px; border-radius: 6px;
+    color: var(--text-soft); font-size: 13px;
+  }
+  .sidebar-sublink:hover { color: var(--text); }
+
+  main.content { padding: 36px 0 80px; min-width: 0; }
+
+  /* Hero */
+  .hero { padding: 16px 0 44px; border-bottom: 1px solid var(--border); margin-bottom: 48px; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--brand-light); color: var(--brand);
+    padding: 4px 11px; border-radius: 999px;
+    font-size: 12px; font-weight: 600;
+    margin-bottom: 18px; border: 1px solid var(--brand-soft);
+  }
+  .hero-eyebrow::before {
+    content: ""; width: 6px; height: 6px; background: var(--brand); border-radius: 999px;
+    box-shadow: 0 0 0 4px rgba(124,58,237,.2);
+  }
+  .hero h1 {
+    font-size: 40px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.1;
+    margin-bottom: 14px;
+  }
+  .hero h1 .gradient {
+    background: linear-gradient(135deg, #7c3aed 0%, #ec4899 60%, #f59e0b 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero p.lead { font-size: 17px; color: var(--text-muted); max-width: 620px; margin-bottom: 22px; }
+  .hero-cta { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 17px; border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    transition: all .15s; cursor: pointer; border: none;
+    font-family: inherit;
+  }
+  .btn-primary { background: var(--text); color: white; }
+  .btn-primary:hover { color: white; opacity: .9; }
+  .btn-secondary { background: var(--bg-subtle); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: white; border-color: var(--border-strong); }
+
+  /* Sections */
+  section.doc-section { margin-bottom: 56px; }
+  section h2 {
+    font-size: 24px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25;
+    margin-bottom: 12px; scroll-margin-top: 80px;
+  }
+  section h3 { font-size: 17px; font-weight: 600; margin: 28px 0 8px; letter-spacing: -0.01em; scroll-margin-top: 80px; }
+  section h4 { font-size: 14.5px; font-weight: 600; margin: 18px 0 6px; color: var(--text); }
+  section p { color: var(--text-muted); margin-bottom: 12px; }
+  section p strong { color: var(--text); font-weight: 600; }
+  section ul, section ol { margin: 10px 0 14px 22px; color: var(--text-muted); }
+  section li { margin-bottom: 4px; }
+
+  code:not(pre code) {
+    font-family: var(--font-mono); font-size: 0.87em;
+    background: var(--bg-code); padding: 2px 6px; border-radius: 4px;
+    color: var(--brand); border: 1px solid var(--border);
+  }
+
+  /* Callout */
+  .callout {
+    border-left: 3px solid var(--brand);
+    background: var(--bg-callout);
+    padding: 12px 16px; border-radius: 0 8px 8px 0;
+    margin: 14px 0; font-size: 14px;
+  }
+  .callout strong { color: var(--brand); }
+  .callout.warn { border-color: var(--accent-amber); background: #fffbeb; }
+  .callout.warn strong { color: #b45309; }
+  .callout.info { border-color: var(--accent-blue); background: #eff6ff; }
+  .callout.info strong { color: #1d4ed8; }
+
+  /* Tables */
+  .doc-table {
+    width: 100%; border-collapse: collapse; margin: 14px 0;
+    font-size: 13.5px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  }
+  .doc-table th, .doc-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .doc-table th { background: var(--bg-subtle); font-weight: 600; color: var(--text); font-size: 12.5px; }
+  .doc-table tr:last-child td { border-bottom: none; }
+  .doc-table code { background: white; }
+
+  /* Code blocks */
+  .code-block {
+    position: relative; background: var(--code-bg);
+    border-radius: 10px; overflow: hidden; margin: 10px 0 18px;
+    border: 1px solid #1e293b;
+  }
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 14px; background: rgba(255,255,255,.03);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    font-size: 11.5px; color: #94a3b8; font-family: var(--font-mono);
+  }
+  .code-lang { font-weight: 600; }
+  .copy-btn {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.08);
+    color: #cbd5e1; padding: 3px 9px; border-radius: 6px;
+    font-size: 11px; font-weight: 600; cursor: pointer; transition: all .15s;
+    font-family: var(--font-sans); display: inline-flex; align-items: center; gap: 5px;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,.12); color: white; }
+  .copy-btn.copied { background: #10b981; color: white; border-color: #10b981; }
+  .code-block pre { margin: 0; padding: 14px 18px; overflow-x: auto; background: var(--code-bg) !important; }
+  .code-block code, .code-block pre code {
+    font-family: var(--font-mono); font-size: 13px; line-height: 1.6;
+    background: transparent !important; color: #e2e8f0; border: none; padding: 0;
+  }
+  .hljs { background: var(--code-bg) !important; color: #e2e8f0 !important; padding: 0 !important; }
+  .hljs-comment, .hljs-quote { color: #64748b; font-style: italic; }
+  .hljs-keyword, .hljs-selector-tag, .hljs-built_in { color: #c084fc; }
+  .hljs-string, .hljs-attr { color: #86efac; }
+  .hljs-number, .hljs-literal { color: #fbbf24; }
+  .hljs-function .hljs-title, .hljs-title.function_ { color: #60a5fa; }
+  .hljs-variable, .hljs-attribute { color: #f87171; }
+  .hljs-meta, .hljs-tag { color: #94a3b8; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 0; }
+  .tab-btn {
+    background: none; border: none; padding: 8px 15px;
+    font-family: var(--font-sans); font-size: 13px; font-weight: 500;
+    color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent;
+    margin-bottom: -1px; transition: all .15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--brand); border-bottom-color: var(--brand); font-weight: 600; }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* FAQ */
+  details.faq { border-bottom: 1px solid var(--border); padding: 12px 0; }
+  details.faq summary {
+    cursor: pointer; font-weight: 600; font-size: 14.5px;
+    list-style: none; display: flex; justify-content: space-between; align-items: center;
+    color: var(--text);
+  }
+  details.faq summary::-webkit-details-marker { display: none; }
+  details.faq summary::after {
+    content: "+"; font-size: 20px; font-weight: 300; color: var(--text-soft); transition: transform .2s;
+  }
+  details.faq[open] summary::after { content: "−"; }
+  details.faq[open] summary { color: var(--brand); }
+  details.faq .faq-body { padding-top: 10px; color: var(--text-muted); font-size: 14px; }
+
+  /* AI Prompt block */
+  .ai-prompt-box {
+    border: 1px solid var(--border-strong); border-radius: 12px;
+    overflow: hidden; margin: 14px 0; background: white;
+  }
+  .ai-prompt-header {
+    background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+    color: white; padding: 10px 16px; font-weight: 600;
+    display: flex; justify-content: space-between; align-items: center; font-size: 13.5px;
+  }
+  .ai-prompt-body pre {
+    margin: 0; padding: 16px;
+    font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6;
+    white-space: pre-wrap; word-wrap: break-word;
+    color: var(--text); background: var(--bg-code);
+    max-height: 320px; overflow-y: auto;
+  }
+  .ai-prompt-header button {
+    background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.3);
+    color: white; padding: 4px 11px; border-radius: 6px;
+    font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s;
+    font-family: var(--font-sans);
+  }
+  .ai-prompt-header button:hover { background: rgba(255,255,255,.3); }
+  .ai-prompt-header button.copied { background: white; color: var(--brand); }
+
+  /* Footer */
+  footer.site-footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 28px; text-align: center;
+    color: var(--text-soft); font-size: 13px; background: var(--bg-subtle);
+  }
+  footer.site-footer a { color: var(--text-muted); margin: 0 8px; }
+
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; gap: 0; padding: 0 18px; }
+    aside.sidebar {
+      position: static; height: auto; padding: 14px 0;
+      border-right: none; border-bottom: 1px solid var(--border); margin-bottom: 18px;
+    }
+    .hero h1 { font-size: 30px; }
+    header.topbar { padding: 0 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="https://www.partykeys.com" class="brand" aria-label="PartyKeys">
+      <img class="brand-logo" src="data:image/png;base64,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" alt="PartyKeys" width="32" height="32">
+      <div class="brand-name"><strong>PartyKeys</strong><span data-i18n="brand_tag">Protocol</span></div>
+    </a>
+    <div class="topbar-actions">
+      <select class="lang-select" id="lang-select" aria-label="Language">
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+        <option value="ja">日本語</option>
+        <option value="ko">한국어</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+        <option value="de">Deutsch</option>
+        <option value="pt">Português</option>
+      </select>
+      <a href="https://github.com/allen4z/PartykeysProtocol" target="_blank" rel="noopener" class="github-btn">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <a href="#quickstart" class="sidebar-link" data-i18n="side_quickstart">Quickstart</a>
+      <a href="#protocol" class="sidebar-link" data-i18n="side_protocol">Protocol</a>
+      <a href="#protocol-partykeys" class="sidebar-sublink" data-i18n="side_partykeys">— PartyKeys 36</a>
+      <a href="#protocol-popupiano" class="sidebar-sublink" data-i18n="side_popupiano">— PopuPiano 29</a>
+      <a href="#sdk" class="sidebar-link" data-i18n="side_sdk">SDK Examples</a>
+      <a href="#ai" class="sidebar-link" data-i18n="side_ai">AI Assistant</a>
+      <a href="#ai-prompt" class="sidebar-sublink" data-i18n="side_prompt">— LLM Prompt</a>
+      <a href="#claude-md" class="sidebar-sublink" data-i18n="side_claude_md">— CLAUDE.md</a>
+      <a href="#faq" class="sidebar-link" data-i18n="side_faq">FAQ</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="content">
+
+    <!-- HERO -->
+    <section class="hero" id="introduction">
+      <div class="hero-eyebrow"><span data-i18n="hero_eyebrow">Open Source · MIT</span></div>
+      <h1>
+        <span data-i18n="hero_title_1">Light up any key,</span>
+        <span class="gradient" data-i18n="hero_title_2">from anywhere.</span>
+      </h1>
+      <p class="lead" data-i18n="hero_lead">The open MIDI + SysEx spec for PartyKeys keyboards. Connect from a browser, a script, or hand it to your AI assistant.</p>
+      <div class="hero-cta">
+        <a href="#quickstart" class="btn btn-primary"><span data-i18n="hero_cta_start">Start</span> →</a>
+        <a href="https://github.com/allen4z/PartykeysProtocol" target="_blank" rel="noopener" class="btn btn-secondary">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </section>
+
+    <!-- QUICKSTART -->
+    <section class="doc-section" id="quickstart">
+      <h2 data-i18n="qs_title">Quickstart</h2>
+      <p data-i18n="qs_lead">Plug in a PartyKeys 36, open Chrome DevTools on any page, and paste:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">JavaScript · Web MIDI</span>
+          <button class="copy-btn" data-copy-target="qs-code"><span data-i18n="copy">Copy</span></button>
+        </div>
+<pre><code class="language-javascript" id="qs-code">const midi = await navigator.requestMIDIAccess({ sysex: true });
+const out = [...midi.outputs.values()].find(p =&gt; /partykey/i.test(p.name));
+
+// Enter LED mode (required once)
+out.send([0xF0, 0x05, 0x30, 0x7F, 0x7F, 0x20, 0x00, 0x0F, 0x01, 0xF7]);
+
+// Light keys 17, 18, 19 red/green/blue
+const enc = v =&gt; [Math.floor(v/128), v % 128];
+out.send([
+  0xF0, 0x05, 0x30, 0x7F, 0x7F, 0x20, 0x00, 0x15, 0x03,
+  ...enc(255), ...enc(0),   ...enc(0),   1, 17,
+  ...enc(0),   ...enc(255), ...enc(0),   1, 18,
+  ...enc(0),   ...enc(0),   ...enc(255), 1, 19,
+  0xF7
+]);</code></pre>
+      </div>
+
+      <div class="callout">
+        <strong data-i18n="qs_callout_label">That's it.</strong>
+        <span data-i18n="qs_callout_body"> Three things matter: (1) ask for SysEx access, (2) send the "enter LED mode" message once, (3) send <code>CMD 15</code> per-key RGB messages whenever the lights should change. Everything else is convenience.</span>
+      </div>
+    </section>
+
+    <!-- PROTOCOL -->
+    <section class="doc-section" id="protocol">
+      <h2 data-i18n="proto_title">Protocol</h2>
+      <p data-i18n="proto_lead"><strong>PartyKeys 36</strong> — 36 keys, MIDI 48–83, USB. Three commands are all you need.</p>
+
+      <h3 id="protocol-partykeys" style="margin-top:24px;font-size:20px">PartyKeys 36</h3>
+      <h4 data-i18n="proto_h1">1. Connect</h4>
+      <p data-i18n="proto_p1">SysEx must be explicitly enabled — without it every LED command is silently dropped.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">JavaScript</span>
+          <button class="copy-btn" data-copy-target="p-connect"><span data-i18n="copy">Copy</span></button>
+        </div>
+<pre><code class="language-javascript" id="p-connect">const access = await navigator.requestMIDIAccess({ sysex: true });
+const out = [...access.outputs.values()].find(p =&gt; /partykey/i.test(p.name));</code></pre>
+      </div>
+
+      <h4 data-i18n="proto_h2">2. Enter LED mode</h4>
+      <p data-i18n="proto_p2">Send once after each (re)connect. Color commands sent before this are no-ops.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SysEx</span>
+          <button class="copy-btn" data-copy-target="p-init"><span data-i18n="copy">Copy</span></button>
+        </div>
+<pre><code class="language-plaintext" id="p-init">F0 05 30 7F 7F 20 00 0F 01 F7</code></pre>
+      </div>
+
+      <h4 data-i18n="proto_h3">3. CMD 15 — per-key RGB</h4>
+      <p data-i18n="proto_p3">Set any number of keys to any 24-bit RGB color in one message. Group keys that share a color.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SysEx frame</span>
+          <button class="copy-btn" data-copy-target="p-cmd15"><span data-i18n="copy">Copy</span></button>
+        </div>
+<pre><code class="language-plaintext" id="p-cmd15">F0 05 30 7F 7F 20 00 15 &lt;numGroups&gt;
+  &lt;group_0&gt; &lt;group_1&gt; ...
+F7
+
+# Each group:
+#   R_hi R_lo  G_hi G_lo  B_hi B_lo  keyCount  key0 key1 ...</code></pre>
+      </div>
+
+      <table class="doc-table">
+        <thead><tr>
+          <th data-i18n="th_field">Field</th>
+          <th data-i18n="th_bytes">Bytes</th>
+          <th data-i18n="th_range">Range</th>
+          <th data-i18n="th_desc">Description</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><code>R_hi R_lo</code></td><td>2</td><td>0x00–0x01, 0x00–0x7F</td><td data-i18n="td_red">Red channel (14-bit MIDI-safe)</td></tr>
+          <tr><td><code>G_hi G_lo</code></td><td>2</td><td data-i18n="td_same">same</td><td data-i18n="td_green">Green channel</td></tr>
+          <tr><td><code>B_hi B_lo</code></td><td>2</td><td data-i18n="td_same">same</td><td data-i18n="td_blue">Blue channel</td></tr>
+          <tr><td><code>keyCount</code></td><td>1</td><td>1–36</td><td data-i18n="td_count">Number of key indices that follow</td></tr>
+          <tr><td><code>key0 … keyN</code></td><td>N</td><td>0–35</td><td data-i18n="td_indices">Key indices (0 = leftmost C3, 35 = rightmost B5)</td></tr>
+        </tbody>
+      </table>
+
+      <p style="margin-top:18px" data-i18n="proto_p_color"><strong>Color encoding</strong> — MIDI is 7-bit, so each 0–255 channel splits into a pair:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Encoder</span>
+          <button class="copy-btn" data-copy-target="p-enc"><span data-i18n="copy">Copy</span></button>
+        </div>
+<pre><code class="language-javascript" id="p-enc">// v ∈ [0, 255]   →   [high, low]
+const enc = v =&gt; [Math.floor(v / 128), v % 128];
+// firmware reconstructs: value = high × 128 + low</code></pre>
+      </div>
+
+      <table class="doc-table">
+        <thead><tr>
+          <th data-i18n="th_value">Color value</th>
+          <th>high</th>
+          <th>low</th>
+          <th data-i18n="th_hex">Hex bytes</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><code>0</code> <span data-i18n="td_off">(off)</span></td><td><code>0x00</code></td><td><code>0x00</code></td><td><code>00 00</code></td></tr>
+          <tr><td><code>51</code></td><td><code>0x00</code></td><td><code>0x33</code></td><td><code>00 33</code></td></tr>
+          <tr><td><code>128</code></td><td><code>0x01</code></td><td><code>0x00</code></td><td><code>01 00</code></td></tr>
+          <tr><td><code>255</code> <span data-i18n="td_max">(max)</span></td><td><code>0x01</code></td><td><code>0x7F</code></td><td><code>01 7F</code></td></tr>
+        </tbody>
+      </table>
+
+      <h4 data-i18n="proto_h4">4. All off</h4>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SysEx</span>
+          <button class="copy-btn" data-copy-target="p-off"><span data-i18n="copy">Copy</span></button>
+        </div>
+<pre><code class="language-plaintext" id="p-off">F0 05 30 7F 7F 20 00 71 00 F7</code></pre>
+      </div>
+
+      <h4 id="key-layout" style="margin-top:30px" data-i18n="proto_layout_h">5. Key layout</h4>
+      <table class="doc-table">
+        <thead><tr>
+          <th data-i18n="th_index">Key index</th>
+          <th data-i18n="th_midi">MIDI note</th>
+          <th data-i18n="th_name">Note name</th>
+          <th data-i18n="th_position">Position</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><code>0</code></td><td><code>48</code></td><td>C3</td><td data-i18n="td_leftmost">Leftmost</td></tr>
+          <tr><td><code>17</code></td><td><code>65</code></td><td>F4</td><td data-i18n="td_middle">Middle</td></tr>
+          <tr><td><code>35</code></td><td><code>83</code></td><td>B5</td><td data-i18n="td_rightmost">Rightmost</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:13.5px;margin-top:6px"><span data-i18n="proto_layout_formula">General formula:</span> <code>midi_note = key_index + 48</code>. <span data-i18n="proto_layout_keys">36 keys total, 3 octaves C3–B5.</span></p>
+
+      <div class="callout warn">
+        <strong data-i18n="proto_warn_label">Note-on echo.</strong>
+        <span data-i18n="proto_warn_body"> The legacy way to light a key (<code>0x90 note 0x40</code>) makes the firmware echo a note-on back as if the player pressed it. Use CMD 15 — it doesn't echo.</span>
+      </div>
+
+      <div class="callout info">
+        <strong data-i18n="proto_lat_label">LED latency ≈ 200 ms.</strong>
+        <span data-i18n="proto_lat_body"> Don't pre-fire the SysEx. Send it at the beat and delay your audio + visuals by the same constant.</span>
+      </div>
+
+      <!-- PopuPiano expanded -->
+      <h3 id="protocol-popupiano" style="margin-top:42px" data-i18n="proto_pp_h">PopuPiano 29 (alt device)</h3>
+      <p data-i18n="proto_pp_lead">29 keys, MIDI 48–76, USB or BLE. Two-step: upload palette, assign slots. No "enter mode" needed.</p>
+
+      <h4 data-i18n="proto_pp_h1">1. Upload a palette (CMD 0x1E)</h4>
+      <p data-i18n="proto_pp_p1">Uploads N colors into the device palette starting at slot 1. Colors are 7-bit RGB — scale 8-bit by <code>min(127, round(v / 2))</code>.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SysEx · CMD 0x1E</span>
+          <button class="copy-btn" data-copy-target="p-pp1"><span data-i18n="copy">Copy</span></button>
+        </div>
+<pre><code class="language-plaintext" id="p-pp1">F0 03 1E &lt;numColors&gt; 01  &lt;R G B&gt; × N  F7
+
+# Example: upload red, green, blue into slots 1–3
+F0 03 1E 03 01  7F 00 00  00 7F 00  00 00 7F  F7</code></pre>
+      </div>
+
+      <h4 data-i18n="proto_pp_h2">2. Assign palette slots to keys (CMD 0x20)</h4>
+      <p data-i18n="proto_pp_p2">Assigns a palette slot to each of the 29 keys. <code>lampID</code> is 0–28; <code>paletteSlot</code> 0 turns a key off.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SysEx · CMD 0x20</span>
+          <button class="copy-btn" data-copy-target="p-pp2"><span data-i18n="copy">Copy</span></button>
+        </div>
+<pre><code class="language-plaintext" id="p-pp2">F0 03 20 &lt;numPairs&gt;  &lt;lampID paletteSlot&gt; × N  F7</code></pre>
+      </div>
+
+      <div class="callout info">
+        <strong data-i18n="proto_pp_tip_label">Tip.</strong>
+        <span data-i18n="proto_pp_tip_body"> Slot 0 is reserved as "off" and cannot be overwritten. The palette persists on the device until power-cycle, so live color updates only need to re-send CMD 0x20 — at audio rate if needed.</span>
+      </div>
+    </section>
+
+    <!-- SDK -->
+    <section class="doc-section" id="sdk">
+      <h2 data-i18n="sdk_title">SDK Examples</h2>
+      <p data-i18n="sdk_lead">Same task in four languages: connect, init, light keys 17–19 red/green/blue.</p>
+
+      <div class="tabs" role="tablist">
+        <button class="tab-btn active" data-tab="js">JavaScript</button>
+        <button class="tab-btn" data-tab="py">Python</button>
+        <button class="tab-btn" data-tab="node">Node.js</button>
+        <button class="tab-btn" data-tab="swift">Swift</button>
+      </div>
+
+      <div class="tab-pane active" id="tab-js">
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Browser · Web MIDI</span>
+            <button class="copy-btn" data-copy-target="sdk-js"><span data-i18n="copy">Copy</span></button>
+          </div>
+<pre><code class="language-javascript" id="sdk-js">const MFR = [0xF0, 0x05, 0x30, 0x7F, 0x7F, 0x20, 0x00];
+const enc = v =&gt; [Math.floor(v / 128), v % 128];
+
+const access = await navigator.requestMIDIAccess({ sysex: true });
+const out = [...access.outputs.values()].find(p =&gt; /partykey/i.test(p.name));
+out.send([...MFR, 0x0F, 0x01, 0xF7]);   // enter LED mode
+
+function setLEDs(groups) {
+  const msg = [...MFR, 0x15, groups.length];
+  for (const g of groups) {
+    msg.push(...enc(g.rgb[0]), ...enc(g.rgb[1]), ...enc(g.rgb[2]));
+    msg.push(g.keys.length, ...g.keys);
+  }
+  msg.push(0xF7);
+  out.send(msg);
+}
+
+setLEDs([
+  { rgb: [255, 0,   0  ], keys: [17] },
+  { rgb: [0,   255, 0  ], keys: [18] },
+  { rgb: [0,   0,   255], keys: [19] },
+]);</code></pre>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="tab-py">
+        <p style="margin-top:14px;font-size:13px;color:var(--text-muted)"><code>pip install mido python-rtmidi</code></p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python · mido</span>
+            <button class="copy-btn" data-copy-target="sdk-py"><span data-i18n="copy">Copy</span></button>
+          </div>
+<pre><code class="language-python" id="sdk-py">import mido
+
+MFR = [0x05, 0x30, 0x7F, 0x7F, 0x20, 0x00]
+enc = lambda v: [v // 128, v % 128]
+
+out = mido.open_output(next(n for n in mido.get_output_names()
+                            if 'partykey' in n.lower()))
+out.send(mido.Message('sysex', data=MFR + [0x0F, 0x01]))   # enter LED mode
+
+def set_leds(groups):
+    payload = MFR + [0x15, len(groups)]
+    for rgb, keys in groups:
+        payload += enc(rgb[0]) + enc(rgb[1]) + enc(rgb[2])
+        payload += [len(keys)] + list(keys)
+    out.send(mido.Message('sysex', data=payload))
+
+set_leds([
+    ((255, 0,   0  ), [17]),
+    ((0,   255, 0  ), [18]),
+    ((0,   0,   255), [19]),
+])</code></pre>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="tab-node">
+        <p style="margin-top:14px;font-size:13px;color:var(--text-muted)"><code>npm install jzz</code></p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Node.js · JZZ</span>
+            <button class="copy-btn" data-copy-target="sdk-node"><span data-i18n="copy">Copy</span></button>
+          </div>
+<pre><code class="language-javascript" id="sdk-node">import JZZ from 'jzz';
+
+const MFR = [0xF0, 0x05, 0x30, 0x7F, 0x7F, 0x20, 0x00];
+const enc = v =&gt; [Math.floor(v / 128), v % 128];
+
+const engine = await JZZ();
+const name = engine.info().outputs.find(p =&gt; /partykey/i.test(p.name)).name;
+const out = JZZ().openMidiOut(name);
+
+out.send([...MFR, 0x0F, 0x01, 0xF7]);   // enter LED mode
+
+function setLEDs(groups) {
+  const msg = [...MFR, 0x15, groups.length];
+  for (const g of groups) {
+    msg.push(...enc(g.rgb[0]), ...enc(g.rgb[1]), ...enc(g.rgb[2]));
+    msg.push(g.keys.length, ...g.keys);
+  }
+  msg.push(0xF7);
+  out.send(msg);
+}
+
+setLEDs([
+  { rgb: [255, 0,   0  ], keys: [17] },
+  { rgb: [0,   255, 0  ], keys: [18] },
+  { rgb: [0,   0,   255], keys: [19] },
+]);</code></pre>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="tab-swift">
+        <p style="margin-top:14px;font-size:13px;color:var(--text-muted)" data-i18n="sdk_swift_note">Link <code>CoreMIDI.framework</code> — no third-party deps.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Swift · CoreMIDI</span>
+            <button class="copy-btn" data-copy-target="sdk-swift"><span data-i18n="copy">Copy</span></button>
+          </div>
+<pre><code class="language-swift" id="sdk-swift">import CoreMIDI
+
+let MFR: [UInt8] = [0xF0, 0x05, 0x30, 0x7F, 0x7F, 0x20, 0x00]
+func enc(_ v: UInt8) -&gt; [UInt8] { [v / 128, v % 128] }
+
+var client = MIDIClientRef(); var port = MIDIPortRef()
+MIDIClientCreate("PK" as CFString, nil, nil, &amp;client)
+MIDIOutputPortCreate(client, "out" as CFString, &amp;port)
+
+var dest: MIDIEndpointRef = 0
+for i in 0..&lt;MIDIGetNumberOfDestinations() {
+    let d = MIDIGetDestination(i)
+    var n: Unmanaged&lt;CFString&gt;?
+    MIDIObjectGetStringProperty(d, kMIDIPropertyName, &amp;n)
+    if ((n?.takeRetainedValue() as String?) ?? "").lowercased().contains("partykey") {
+        dest = d; break
+    }
+}
+
+func sendSysEx(_ data: [UInt8]) {
+    var pkt = MIDIPacketList()
+    let p = MIDIPacketListInit(&amp;pkt)
+    _ = MIDIPacketListAdd(&amp;pkt, 1024, p, 0, data.count, data)
+    MIDISend(port, dest, &amp;pkt)
+}
+
+sendSysEx(MFR + [0x0F, 0x01, 0xF7])      // enter LED mode
+
+func setLEDs(_ groups: [(rgb: (UInt8, UInt8, UInt8), keys: [UInt8])]) {
+    var msg = MFR + [0x15, UInt8(groups.count)]
+    for g in groups {
+        msg += enc(g.rgb.0) + enc(g.rgb.1) + enc(g.rgb.2)
+        msg += [UInt8(g.keys.count)] + g.keys
+    }
+    msg.append(0xF7)
+    sendSysEx(msg)
+}
+
+setLEDs([
+    (rgb: (255, 0,   0  ), keys: [17]),
+    (rgb: (0,   255, 0  ), keys: [18]),
+    (rgb: (0,   0,   255), keys: [19]),
+])</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI -->
+    <section class="doc-section" id="ai">
+      <h2 data-i18n="ai_title">AI Assistant</h2>
+      <p data-i18n="ai_lead">Two ways to give your AI assistant full protocol knowledge.</p>
+
+      <h3 id="ai-prompt" data-i18n="ai_prompt_h">One-click LLM Prompt</h3>
+      <p data-i18n="ai_prompt_p">Paste into Claude, ChatGPT, Codex, Cursor — anywhere.</p>
+
+      <div class="ai-prompt-box">
+        <div class="ai-prompt-header">
+          <span data-i18n="ai_prompt_header">📋 Paste into any AI chat</span>
+          <button id="copy-llm-prompt" data-copy-target="llm-prompt"><span data-i18n="copy">Copy</span></button>
+        </div>
+        <div class="ai-prompt-body">
+<pre id="llm-prompt">You are a PartyKeys Protocol expert. PartyKeys is an open-source MIDI keyboard
+with addressable RGB LEDs per key. Two devices exist:
+
+═══ DEVICE A — PartyKeys 36 ═══
+• 36 keys, MIDI 48–83 (C3–B5), key_index = midi_note − 48
+• USB MIDI, requires SysEx: requestMIDIAccess({sysex:true})
+• Manufacturer header: 05 30 7F 7F 20 00
+• Detect by port name containing /partykey/i
+
+PROTOCOL:
+1. Enter LED mode (REQUIRED ONCE after connect):
+   F0 05 30 7F 7F 20 00 0F 01 F7
+
+2. CMD 0x15 — per-key RGB (the workhorse):
+   F0 05 30 7F 7F 20 00 15 &lt;numGroups&gt;
+     &lt;group&gt; × N
+   F7
+
+   Each group: R_hi R_lo  G_hi G_lo  B_hi B_lo  keyCount  key0 key1 ...
+
+   Color encoding (MIDI is 7-bit, channel is 0–255):
+     high = floor(v / 128)    low = v % 128
+     255 = [0x01, 0x7F]   128 = [0x01, 0x00]   0 = [0x00, 0x00]
+
+3. All off:
+   F0 05 30 7F 7F 20 00 71 00 F7
+
+4. CMD 15 does NOT echo. Legacy note-on LEDs (0x90 note 0x40) DO echo
+   back to your input handler — always prefer CMD 15.
+
+5. Hardware LED latency ~200 ms. To sync with audio: fire SysEx at the
+   beat, delay audio + visuals by ~200 ms.
+
+═══ DEVICE B — PopuPiano 29 ═══
+• 29 keys, MIDI 48–76 (C3–E5), USB or BLE MIDI
+• Manufacturer header: 03 — detect by port name /popupiano/i
+• No "enter mode" message needed.
+
+PROTOCOL:
+1. CMD 0x1E — upload palette (7-bit RGB; scale 8→7 as v/2):
+   F0 03 1E &lt;numColors&gt; 01  &lt;R G B&gt; × N  F7
+   (Slot 0 reserved as "off"; custom colors live in slots 1–127.)
+
+2. CMD 0x20 — assign palette slots to keys:
+   F0 03 20 &lt;numPairs&gt;  &lt;lampID paletteSlot&gt; × N  F7
+   (lampID 0–28, slot 0 = off; palette persists until power-cycle.)
+
+RULES:
+✅ Always {sysex:true} for PartyKeys 36
+✅ Always send "enter LED mode" before any color on PartyKeys 36
+✅ Use delta updates — only send keys that changed
+❌ Don't send 8-bit color on the wire — must be 7-bit encoded
+
+Write working integration code in the user's language (JS/Web MIDI,
+Python/mido, Node/JZZ, Swift/CoreMIDI).
+
+Spec: https://github.com/allen4z/PartykeysProtocol
+Docs: https://www.partykeys.com/developers</pre>
+        </div>
+      </div>
+
+      <h3 id="claude-md" style="margin-top:32px" data-i18n="ai_cmd_h">CLAUDE.md / .cursorrules template</h3>
+      <p data-i18n="ai_cmd_p">Drop into your repo root. Claude Code, Cursor, and Copilot read it automatically.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">CLAUDE.md  ·  .cursorrules  ·  .github/copilot-instructions.md</span>
+          <button class="copy-btn" data-copy-target="claude-md"><span data-i18n="copy">Copy</span></button>
+        </div>
+<pre><code class="language-markdown" id="claude-md"># PartyKeys Project Conventions
+
+This project integrates with **PartyKeys Protocol** — open MIDI + SysEx
+spec for the PartyKeys 36 (C3–B5, MIDI 48–83) keyboard.
+
+## Protocol cheat sheet
+
+Always request SysEx:
+```js
+const access = await navigator.requestMIDIAccess({ sysex: true });
+```
+
+Always send "enter LED mode" once after (re)connect:
+```
+F0 05 30 7F 7F 20 00 0F 01 F7
+```
+
+Per-key RGB is the primary command (CMD 0x15). Each 8-bit color channel
+splits 7-bit: `high = floor(v/128); low = v % 128`.
+
+Frame:
+```
+F0 05 30 7F 7F 20 00 15 &lt;numGroups&gt;
+  &lt;R_hi R_lo G_hi G_lo B_hi B_lo keyCount key0 key1 ...&gt; × N
+F7
+```
+
+All off: `F0 05 30 7F 7F 20 00 71 00 F7`
+
+## Conventions
+
+- Use the helper `setLEDs(groups)` — never craft raw SysEx at call sites.
+- Use delta updates: only send keys whose color is changing.
+- Prefer CMD 15 over legacy note-on LEDs (those echo back as fake input).
+- Hardware LED latency ≈ 200 ms; if syncing to audio, delay audio + visuals
+  by `HW_LATENCY_MS` instead of pre-firing SysEx.
+- Always `allOff()` on app teardown.
+
+Spec: https://github.com/allen4z/PartykeysProtocol
+</code></pre>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="doc-section" id="faq">
+      <h2 data-i18n="faq_title">FAQ</h2>
+
+      <details class="faq">
+        <summary data-i18n="faq_1_q">My color commands do nothing.</summary>
+        <div class="faq-body" data-i18n="faq_1_a">Three checks: (1) <code>{sysex: true}</code> in <code>requestMIDIAccess</code>, (2) sent "enter LED mode" after connect, (3) you encoded each 8-bit channel as two 7-bit bytes. That's 99% of cases.</div>
+      </details>
+
+      <details class="faq">
+        <summary data-i18n="faq_2_q">LEDs trail my audio.</summary>
+        <div class="faq-body" data-i18n="faq_2_a">Hardware delay is ~150–250 ms. Don't pre-fire SysEx — send at the beat, then delay your audio + visuals by ~200 ms (one constant).</div>
+      </details>
+
+      <details class="faq">
+        <summary data-i18n="faq_3_q">My input handler fires when I light a key.</summary>
+        <div class="faq-body" data-i18n="faq_3_a">You're using legacy note-on LEDs (<code>0x90 note 0x40</code>). The firmware echoes those as fake player input. Switch to CMD 15 — it doesn't echo.</div>
+      </details>
+
+      <details class="faq">
+        <summary data-i18n="faq_4_q">Which browsers / OSes work?</summary>
+        <div class="faq-body" data-i18n="faq_4_a">PartyKeys 36 needs Chrome or Edge (Web MIDI + SysEx). For Safari/iOS use the Swift example. The device is class-compliant USB MIDI — no driver install.</div>
+      </details>
+    </section>
+
+  </main>
+</div>
+
+<footer class="site-footer">
+  <p>
+    <a href="https://github.com/allen4z/PartykeysProtocol" target="_blank" rel="noopener">github.com/allen4z/PartykeysProtocol</a>
+    · MIT License ·
+    <a href="https://www.partykeys.com" data-i18n="footer_home">partykeys.com</a>
+  </p>
+</footer>
+
+<script>
+const i18n = {
+  en: {
+    brand_tag: "Protocol",
+    side_quickstart: "Quickstart",
+    side_protocol: "Protocol",
+    side_popupiano: "— PopuPiano 29",
+    side_sdk: "SDK Examples",
+    side_ai: "AI Assistant",
+    side_prompt: "— LLM Prompt",
+    side_claude_md: "— CLAUDE.md",
+    side_faq: "FAQ",
+    hero_eyebrow: "Open Source · MIT",
+    hero_title_1: "Light up any key,",
+    hero_title_2: "from anywhere.",
+    hero_lead: "The open MIDI + SysEx spec for PartyKeys keyboards. Connect from a browser, a script, or hand it to your AI assistant.",
+    hero_cta_start: "Start",
+    copy: "Copy",
+    qs_title: "60-Second Quickstart",
+    qs_lead: "Paste this into the browser DevTools console on any page (Chrome or Edge). With a PartyKeys 36 plugged in via USB, the middle three keys will turn red, green, and blue.",
+    proto_title: "Protocol",
+    proto_lead: "<strong>PartyKeys 36</strong> — 36 keys, MIDI 48–83, USB. Three commands are all you need.",
+    proto_h1: "1. Connect",
+    proto_p1: "SysEx must be explicitly enabled — without it every LED command is silently dropped.",
+    proto_h2: "2. Enter LED mode",
+    proto_p2: "Send once after each (re)connect. Color commands sent before this are no-ops.",
+    proto_h3: "3. CMD 15 — per-key RGB",
+    proto_p3: "Set any number of keys to any 24-bit RGB color in one message. Group keys that share a color.",
+    proto_p_color: "<strong>Color encoding</strong> — MIDI is 7-bit, so each 0–255 channel splits into a pair:",
+    proto_h4: "4. All off",
+    proto_layout_label: "Key layout:",
+    proto_layout_body: "<code>midi_note = key_index + 48</code>. Index 0 = leftmost (C3), 35 = rightmost (B5).",
+    proto_warn_label: "Note-on echo.",
+    proto_warn_body: " The legacy way to light a key (<code>0x90 note 0x40</code>) makes the firmware echo a note-on back as if the player pressed it. Use CMD 15 — it doesn't echo.",
+    proto_lat_label: "LED latency ≈ 200 ms.",
+    proto_lat_body: " Don't pre-fire the SysEx. Send it at the beat and delay your audio + visuals by the same constant.",
+    proto_pp_h: "PopuPiano 29 (alt device)",
+    proto_pp_lead: "29 keys, MIDI 48–76, USB or BLE. Two-step: upload palette, assign slots. No \"enter mode\" needed.",
+    sdk_title: "SDK Examples",
+    sdk_lead: "Same task in four languages: connect, init, light keys 17–19 red/green/blue.",
+    sdk_swift_note: "Link <code>CoreMIDI.framework</code> — no third-party deps.",
+    ai_title: "AI Assistant",
+    ai_lead: "Two ways to give your AI assistant full protocol knowledge.",
+    ai_prompt_h: "One-click LLM Prompt",
+    ai_prompt_p: "Paste into Claude, ChatGPT, Codex, Cursor — anywhere.",
+    ai_prompt_header: "📋 Paste into any AI chat",
+    ai_cmd_h: "CLAUDE.md / .cursorrules template",
+    ai_cmd_p: "Drop into your repo root. Claude Code, Cursor, and Copilot read it automatically.",
+    faq_title: "FAQ",
+    faq_1_q: "My color commands do nothing.",
+    faq_1_a: "Three checks: (1) <code>{sysex: true}</code> in <code>requestMIDIAccess</code>, (2) sent \"enter LED mode\" after connect, (3) you encoded each 8-bit channel as two 7-bit bytes. That's 99% of cases.",
+    faq_2_q: "LEDs trail my audio.",
+    faq_2_a: "Hardware delay is ~150–250 ms. Don't pre-fire SysEx — send at the beat, then delay your audio + visuals by ~200 ms (one constant).",
+    faq_3_q: "My input handler fires when I light a key.",
+    faq_3_a: "You're using legacy note-on LEDs (<code>0x90 note 0x40</code>). The firmware echoes those as fake player input. Switch to CMD 15 — it doesn't echo.",
+    faq_4_q: "Which browsers / OSes work?",
+    faq_4_a: "PartyKeys 36 needs Chrome or Edge (Web MIDI + SysEx). For Safari/iOS use the Swift example. The device is class-compliant USB MIDI — no driver install.",
+    th_field: "Field",
+    th_bytes: "Bytes",
+    th_range: "Range",
+    th_desc: "Description",
+    td_red: "Red channel (14-bit MIDI-safe)",
+    td_green: "Green channel",
+    td_blue: "Blue channel",
+    td_same: "same",
+    td_count: "Number of key indices that follow",
+    td_indices: "Key indices (0 = leftmost C3, 35 = rightmost B5)",
+    th_value: "Color value",
+    th_hex: "Hex bytes",
+    td_off: "(off)",
+    td_max: "(max)",
+    proto_layout_h: "5. Key layout",
+    th_index: "Key index",
+    th_midi: "MIDI note",
+    th_name: "Note name",
+    th_position: "Position",
+    td_leftmost: "Leftmost",
+    td_middle: "Middle",
+    td_rightmost: "Rightmost",
+    proto_layout_formula: "General formula:",
+    proto_layout_keys: "36 keys total, 3 octaves C3–B5.",
+    proto_pp_h1: "1. Upload a palette (CMD 0x1E)",
+    proto_pp_p1: "Uploads N colors into the device palette starting at slot 1. Colors are 7-bit RGB — scale 8-bit by <code>min(127, round(v / 2))</code>.",
+    proto_pp_h2: "2. Assign palette slots to keys (CMD 0x20)",
+    proto_pp_p2: "Assigns a palette slot to each of the 29 keys. <code>lampID</code> is 0–28; <code>paletteSlot</code> 0 turns a key off.",
+    proto_pp_tip_label: "Tip.",
+    proto_pp_tip_body: " Slot 0 is reserved as \"off\" and cannot be overwritten. The palette persists on the device until power-cycle, so live color updates only need to re-send CMD 0x20 — at audio rate if needed.",
+    side_partykeys: "— PartyKeys 36",
+    qs_callout_label: "That's it.",
+    qs_callout_body: " Three things matter: (1) ask for SysEx access, (2) send the \"enter LED mode\" message once, (3) send <code>CMD 15</code> per-key RGB messages whenever the lights should change. Everything else is convenience.",
+    footer_home: "partykeys.com",
+  },
+  zh: {
+    brand_tag: "协议",
+    side_quickstart: "快速上手",
+    side_protocol: "协议规范",
+    side_popupiano: "— PopuPiano 29",
+    side_sdk: "SDK 示例",
+    side_ai: "AI 助手",
+    side_prompt: "— LLM Prompt",
+    side_claude_md: "— CLAUDE.md",
+    side_faq: "常见问题",
+    hero_eyebrow: "开源 · MIT",
+    hero_title_1: "点亮任意琴键，",
+    hero_title_2: "从任何地方。",
+    hero_lead: "PartyKeys 键盘的开源 MIDI + SysEx 协议。从浏览器、脚本、或直接交给 AI 助手都能接入。",
+    hero_cta_start: "开始",
+    copy: "复制",
+    qs_title: "60 秒上手",
+    qs_lead: "把下面这段直接粘到任意网页的浏览器 DevTools 控制台（Chrome 或 Edge）。只要 PartyKeys 36 通过 USB 连着，中间三颗琴键就会分别变成红、绿、蓝。",
+    proto_title: "协议规范",
+    proto_lead: "<strong>PartyKeys 36</strong> — 36 键，MIDI 48–83，USB。三条命令搞定一切。",
+    proto_h1: "1. 连接设备",
+    proto_p1: "必须显式启用 SysEx —— 否则所有 LED 命令都会被浏览器静默丢弃。",
+    proto_h2: "2. 进入 LED 模式",
+    proto_p2: "每次连接或重连后发一次。在它之前发的颜色命令一律无效。",
+    proto_h3: "3. CMD 15 — 每键 RGB",
+    proto_p3: "一条消息把任意数量琴键设为任意 24-bit RGB 颜色。同色琴键归到一组。",
+    proto_p_color: "<strong>颜色编码</strong> —— MIDI 数据字节是 7-bit，所以每个 0–255 通道要拆成 high/low 一对：",
+    proto_h4: "4. 全部熄灭",
+    proto_layout_label: "琴键布局：",
+    proto_layout_body: "<code>midi_note = key_index + 48</code>。索引 0 = 最左 (C3)，35 = 最右 (B5)。",
+    proto_warn_label: "Note-on 会回声。",
+    proto_warn_body: " 用 note-on（<code>0x90 note 0x40</code>）点灯，固件会把命令回送给输入回调，看起来跟玩家按键一样。请用 CMD 15 —— 它不回声。",
+    proto_lat_label: "LED 延迟约 200 ms。",
+    proto_lat_body: " 不要提前发 SysEx。在节拍那一刻发，同时把音频和画面延后同样的常量。",
+    proto_pp_h: "PopuPiano 29（备选设备）",
+    proto_pp_lead: "29 键，MIDI 48–76，USB 或 BLE。两步走：上传调色板、分配 slot。无需「进入模式」消息。",
+    sdk_title: "SDK 示例",
+    sdk_lead: "四种语言做同一件事：连接、初始化、把 17/18/19 号键点成红/绿/蓝。",
+    sdk_swift_note: "工程里链接 <code>CoreMIDI.framework</code>，无需任何第三方依赖。",
+    ai_title: "AI 助手",
+    ai_lead: "两种方式让你的 AI 助手完整掌握协议。",
+    ai_prompt_h: "一键 LLM Prompt",
+    ai_prompt_p: "粘到 Claude、ChatGPT、Codex、Cursor —— 任何地方。",
+    ai_prompt_header: "📋 粘贴到任意 AI 对话",
+    ai_cmd_h: "CLAUDE.md / .cursorrules 模板",
+    ai_cmd_p: "放到你的 repo 根目录。Claude Code、Cursor、Copilot 会自动读取。",
+    faq_title: "常见问题",
+    faq_1_q: "颜色命令完全没反应。",
+    faq_1_a: "三件事自查：（1）<code>requestMIDIAccess</code> 写了 <code>{sysex: true}</code>，（2）连上后发过「进入 LED 模式」，（3）8-bit 颜色拆成了两个 7-bit 字节。99% 的情况是这三个。",
+    faq_2_q: "LED 看上去比音频慢一拍。",
+    faq_2_a: "硬件延迟 150–250 ms。别提前发 SysEx —— 在节拍那一刻发，然后把音频和画面延后约 200 ms（一个常量）。",
+    faq_3_q: "点灯的时候输入回调也触发了。",
+    faq_3_a: "你在用旧的 note-on 点灯方式（<code>0x90 note 0x40</code>）。固件会把这些消息回送回来，跟玩家按键无法区分。换 CMD 15 —— 它不回声。",
+    faq_4_q: "支持什么浏览器和系统？",
+    faq_4_a: "PartyKeys 36 需要 Chrome 或 Edge（Web MIDI + SysEx）。Safari/iOS 请用 Swift 示例。设备是 USB MIDI 标准类，无需安装驱动。",
+    th_field: "字段",
+    th_bytes: "字节数",
+    th_range: "取值范围",
+    th_desc: "说明",
+    td_red: "红通道（14-bit MIDI 安全编码）",
+    td_green: "绿通道",
+    td_blue: "蓝通道",
+    td_same: "同上",
+    td_count: "随后跟随的琴键索引数量",
+    td_indices: "琴键索引（0 = 最左 C3，35 = 最右 B5）",
+    th_value: "颜色值",
+    th_hex: "十六进制字节",
+    td_off: "（熄灭）",
+    td_max: "（最大）",
+    proto_layout_h: "5. 琴键布局",
+    th_index: "琴键索引",
+    th_midi: "MIDI 音符",
+    th_name: "音名",
+    th_position: "位置",
+    td_leftmost: "最左",
+    td_middle: "中部",
+    td_rightmost: "最右",
+    proto_layout_formula: "通用公式：",
+    proto_layout_keys: "共 36 键，跨 3 个八度（C3–B5）。",
+    proto_pp_h1: "1. 上传调色板（CMD 0x1E）",
+    proto_pp_p1: "把 N 个颜色上传到设备调色板，从 slot 1 开始。颜色是 7-bit RGB——8-bit 值按 <code>min(127, round(v / 2))</code> 缩放。",
+    proto_pp_h2: "2. 把 slot 分配给琴键（CMD 0x20）",
+    proto_pp_p2: "给 29 个琴键中的每一个分配一个调色板 slot。<code>lampID</code> 取 0–28，<code>paletteSlot</code> 取 0 就是熄灭。",
+    proto_pp_tip_label: "提示。",
+    proto_pp_tip_body: " Slot 0 被保留为「熄灭」，不能覆盖。调色板会保存在设备里直到断电，所以更新灯效只需要重发 CMD 0x20——按需要可以做到音频级速率。",
+    side_partykeys: "— PartyKeys 36",
+    qs_callout_label: "就这么简单。",
+    qs_callout_body: " 三件事最关键：（1）请求 SysEx 权限，（2）发送一次「进入 LED 模式」指令，（3）需要变化时发 <code>CMD 15</code> 每键 RGB 指令。其他的都只是封装。",
+    footer_home: "partykeys.com",
+  },
+  ja: {
+    brand_tag: "プロトコル",
+    side_quickstart: "クイックスタート",
+    side_protocol: "プロトコル",
+    side_popupiano: "— PopuPiano 29",
+    side_sdk: "SDK サンプル",
+    side_ai: "AI アシスタント",
+    side_prompt: "— LLM プロンプト",
+    side_claude_md: "— CLAUDE.md",
+    side_faq: "FAQ",
+    hero_eyebrow: "オープンソース · MIT",
+    hero_title_1: "どんな鍵盤も、",
+    hero_title_2: "どこからでも光らせる。",
+    hero_lead: "PartyKeys キーボード用のオープンな MIDI + SysEx 仕様。ブラウザから、スクリプトから、または AI アシスタントに渡すだけで接続できます。",
+    hero_cta_start: "始める",
+    copy: "コピー",
+    qs_title: "60 秒クイックスタート",
+    qs_lead: "任意のページのブラウザ DevTools コンソールに貼り付けてください（Chrome または Edge）。PartyKeys 36 を USB で接続していれば、中央の 3 鍵が赤・緑・青に点灯します。",
+    proto_title: "プロトコル",
+    proto_lead: "<strong>PartyKeys 36</strong> — 36 鍵盤、MIDI 48–83、USB。必要なのは 3 つのコマンドだけ。",
+    proto_h1: "1. 接続",
+    proto_p1: "SysEx を明示的に有効にする必要があります —— 有効にしないと LED コマンドはすべて無視されます。",
+    proto_h2: "2. LED モードに入る",
+    proto_p2: "接続・再接続のたびに 1 回送信します。これより前に送ったカラーコマンドは無効になります。",
+    proto_h3: "3. CMD 15 — キー単位の RGB",
+    proto_p3: "1 つのメッセージで、任意の数のキーを任意の 24-bit RGB カラーに設定できます。同じ色のキーは 1 グループにまとめてください。",
+    proto_p_color: "<strong>カラーエンコーディング</strong> — MIDI は 7-bit なので、0–255 の各チャンネルは high/low のペアに分割します：",
+    proto_h4: "4. 全消灯",
+    proto_layout_label: "鍵盤レイアウト：",
+    proto_layout_body: "<code>midi_note = key_index + 48</code>。インデックス 0 = 最左端 (C3)、35 = 最右端 (B5)。",
+    proto_warn_label: "Note-on のエコー。",
+    proto_warn_body: " 旧来の方法（<code>0x90 note 0x40</code>）でキーを光らせると、ファームウェアはプレイヤーが押したかのように note-on を返してきます。CMD 15 を使ってください —— エコーしません。",
+    proto_lat_label: "LED の遅延は約 200 ms。",
+    proto_lat_body: " SysEx を先送りしないでください。拍に合わせて送信し、オーディオと画面表示を同じ定数だけ遅らせます。",
+    proto_pp_h: "PopuPiano 29（別デバイス）",
+    proto_pp_lead: "29 鍵盤、MIDI 48–76、USB または BLE。2 ステップ：パレットをアップロード、スロットを割り当て。「モード切替」メッセージは不要。",
+    sdk_title: "SDK サンプル",
+    sdk_lead: "4 つの言語で同じタスク：接続、初期化、キー 17–19 を赤・緑・青に点灯。",
+    sdk_swift_note: "<code>CoreMIDI.framework</code> をリンク —— サードパーティ依存なし。",
+    ai_title: "AI アシスタント",
+    ai_lead: "AI アシスタントにプロトコルを完全に理解させる 2 つの方法。",
+    ai_prompt_h: "ワンクリック LLM プロンプト",
+    ai_prompt_p: "Claude、ChatGPT、Codex、Cursor —— どこにでも貼り付け OK。",
+    ai_prompt_header: "📋 任意の AI チャットに貼り付け",
+    ai_cmd_h: "CLAUDE.md / .cursorrules テンプレート",
+    ai_cmd_p: "リポジトリのルートに置くだけ。Claude Code、Cursor、Copilot が自動的に読み込みます。",
+    faq_title: "FAQ",
+    faq_1_q: "カラーコマンドが何も反応しません。",
+    faq_1_a: "3 つを確認：（1）<code>requestMIDIAccess</code> に <code>{sysex: true}</code> を書いたか、（2）接続後に「LED モードに入る」を送ったか、（3）各 8-bit チャンネルを 7-bit×2 バイトに分割したか。99% はこのいずれか。",
+    faq_2_q: "LED がオーディオより遅れます。",
+    faq_2_a: "ハードウェア遅延は約 150–250 ms。SysEx を先送りせず、拍に合わせて送り、オーディオと画面表示を約 200 ms（同じ定数）遅らせます。",
+    faq_3_q: "キーを光らせると入力ハンドラが反応します。",
+    faq_3_a: "旧来の note-on LED 方式（<code>0x90 note 0x40</code>）を使っています。ファームウェアはそれを偽の入力としてエコーバックします。CMD 15 に切り替えてください —— エコーしません。",
+    faq_4_q: "対応するブラウザ・OS は？",
+    faq_4_a: "PartyKeys 36 は Chrome または Edge が必要です（Web MIDI + SysEx）。Safari/iOS では Swift サンプルを使ってください。デバイスはクラス準拠 USB MIDI のため、ドライバのインストールは不要です。",
+    th_field: "フィールド",
+    th_bytes: "バイト数",
+    th_range: "範囲",
+    th_desc: "説明",
+    td_red: "赤チャンネル（14-bit MIDI セーフ）",
+    td_green: "緑チャンネル",
+    td_blue: "青チャンネル",
+    td_same: "同上",
+    td_count: "続くキーインデックスの数",
+    td_indices: "キーインデックス（0 = 最左端 C3、35 = 最右端 B5）",
+    th_value: "カラー値",
+    th_hex: "16進バイト",
+    td_off: "（消灯）",
+    td_max: "（最大）",
+    proto_layout_h: "5. 鍵盤レイアウト",
+    th_index: "キーインデックス",
+    th_midi: "MIDI ノート",
+    th_name: "音名",
+    th_position: "位置",
+    td_leftmost: "最左端",
+    td_middle: "中央",
+    td_rightmost: "最右端",
+    proto_layout_formula: "一般式：",
+    proto_layout_keys: "全 36 鍵、3 オクターブ（C3–B5）。",
+    proto_pp_h1: "1. パレットをアップロード（CMD 0x1E）",
+    proto_pp_p1: "N 個の色をスロット 1 から始まるデバイスパレットにアップロードします。色は 7-bit RGB —— 8-bit 値を <code>min(127, round(v / 2))</code> で縮小します。",
+    proto_pp_h2: "2. パレットスロットをキーに割り当て（CMD 0x20）",
+    proto_pp_p2: "29 鍵盤の各キーにパレットスロットを割り当てます。<code>lampID</code> は 0–28、<code>paletteSlot</code> = 0 でそのキーは消灯。",
+    proto_pp_tip_label: "ヒント。",
+    proto_pp_tip_body: " スロット 0 は「消灯」として予約されており、上書きできません。パレットは電源を切るまでデバイス内に保持されるため、ライブのカラー更新は CMD 0x20 を再送するだけで OK ―― 必要ならオーディオレートでも可能です。",
+    side_partykeys: "— PartyKeys 36",
+    qs_callout_label: "これだけ。",
+    qs_callout_body: " 重要なのは 3 つだけ：（1）SysEx アクセスを要求する、（2）「LED モードに入る」メッセージを 1 回送る、（3）色を変えたいときに <code>CMD 15</code> のキー単位 RGB メッセージを送る。残りはすべて便利機能。",
+    footer_home: "partykeys.com",
+  },
+  ko: {
+    brand_tag: "프로토콜",
+    side_quickstart: "빠른 시작",
+    side_protocol: "프로토콜",
+    side_popupiano: "— PopuPiano 29",
+    side_sdk: "SDK 예제",
+    side_ai: "AI 어시스턴트",
+    side_prompt: "— LLM 프롬프트",
+    side_claude_md: "— CLAUDE.md",
+    side_faq: "FAQ",
+    hero_eyebrow: "오픈소스 · MIT",
+    hero_title_1: "어떤 건반도,",
+    hero_title_2: "어디서든 빛나게.",
+    hero_lead: "PartyKeys 키보드를 위한 오픈 MIDI + SysEx 사양. 브라우저, 스크립트, 또는 AI 어시스턴트에 직접 넘겨서 연동하세요.",
+    hero_cta_start: "시작",
+    copy: "복사",
+    qs_title: "60초 빠른 시작",
+    qs_lead: "이 코드를 어떤 페이지든 Chrome 또는 Edge의 DevTools 콘솔에 붙여넣으세요. PartyKeys 36이 USB로 연결되어 있으면 중앙 3개 건반이 빨강·초록·파랑으로 켜집니다.",
+    proto_title: "프로토콜",
+    proto_lead: "<strong>PartyKeys 36</strong> — 36건반, MIDI 48–83, USB. 명령 세 개면 충분합니다.",
+    proto_h1: "1. 연결",
+    proto_p1: "SysEx를 명시적으로 활성화해야 합니다 — 그렇지 않으면 모든 LED 명령이 조용히 무시됩니다.",
+    proto_h2: "2. LED 모드 진입",
+    proto_p2: "(재)연결할 때마다 한 번씩 보냅니다. 이 전에 보낸 색상 명령은 무시됩니다.",
+    proto_h3: "3. CMD 15 — 키별 RGB",
+    proto_p3: "메시지 하나로 원하는 만큼의 키를 24-bit RGB 색상으로 설정합니다. 같은 색의 키는 한 그룹으로 묶으세요.",
+    proto_p_color: "<strong>색상 인코딩</strong> — MIDI는 7비트이므로 0–255 각 채널은 high/low 쌍으로 나누어야 합니다:",
+    proto_h4: "4. 모두 끄기",
+    proto_layout_label: "건반 배치:",
+    proto_layout_body: "<code>midi_note = key_index + 48</code>. 인덱스 0 = 가장 왼쪽 (C3), 35 = 가장 오른쪽 (B5).",
+    proto_warn_label: "Note-on 에코.",
+    proto_warn_body: " 키를 켜는 옛 방식(<code>0x90 note 0x40</code>)을 쓰면 펌웨어가 마치 연주자가 누른 것처럼 note-on을 되돌려 보냅니다. CMD 15을 쓰세요 — 에코가 없습니다.",
+    proto_lat_label: "LED 지연 약 200 ms.",
+    proto_lat_body: " SysEx를 미리 보내지 마세요. 박자에 맞춰 보내고, 오디오와 화면을 같은 상수만큼 지연시키세요.",
+    proto_pp_h: "PopuPiano 29 (대체 디바이스)",
+    proto_pp_lead: "29건반, MIDI 48–76, USB 또는 BLE. 두 단계: 팔레트 업로드, 슬롯 할당. \"모드 진입\" 메시지 불필요.",
+    sdk_title: "SDK 예제",
+    sdk_lead: "네 가지 언어로 같은 작업: 연결, 초기화, 17–19번 키를 빨강/초록/파랑으로 점등.",
+    sdk_swift_note: "<code>CoreMIDI.framework</code> 링크 — 외부 의존성 없음.",
+    ai_title: "AI 어시스턴트",
+    ai_lead: "AI 어시스턴트에게 프로토콜 지식을 완전히 부여하는 두 가지 방법.",
+    ai_prompt_h: "원클릭 LLM 프롬프트",
+    ai_prompt_p: "Claude, ChatGPT, Codex, Cursor — 어디든 붙여넣으세요.",
+    ai_prompt_header: "📋 어떤 AI 채팅에든 붙여넣기",
+    ai_cmd_h: "CLAUDE.md / .cursorrules 템플릿",
+    ai_cmd_p: "리포지토리 루트에 두기만 하면 Claude Code, Cursor, Copilot이 자동으로 읽어 들입니다.",
+    faq_title: "FAQ",
+    faq_1_q: "색상 명령이 아무 반응이 없어요.",
+    faq_1_a: "세 가지 점검: (1) <code>requestMIDIAccess</code>에 <code>{sysex: true}</code> 추가, (2) 연결 후 \"LED 모드 진입\" 전송, (3) 8비트 채널을 7비트 두 바이트로 인코딩. 99%가 여기서 해결됩니다.",
+    faq_2_q: "LED가 오디오보다 느려요.",
+    faq_2_a: "하드웨어 지연이 150–250 ms입니다. SysEx를 미리 보내지 말고 박자에 맞춰 보내며, 오디오와 화면을 약 200 ms(상수 하나)만큼 지연시키세요.",
+    faq_3_q: "키를 켤 때 입력 핸들러가 호출돼요.",
+    faq_3_a: "옛 note-on 점등 방식(<code>0x90 note 0x40</code>)을 쓰고 있습니다. 펌웨어가 그것을 가짜 입력처럼 에코로 보냅니다. CMD 15로 바꾸세요 — 에코가 없습니다.",
+    faq_4_q: "어떤 브라우저와 OS에서 동작하나요?",
+    faq_4_a: "PartyKeys 36은 Chrome 또는 Edge가 필요합니다(Web MIDI + SysEx). Safari/iOS는 Swift 예제를 사용하세요. 클래스 컴플라이언트 USB MIDI 장치이므로 드라이버 설치는 불필요합니다.",
+    th_field: "필드",
+    th_bytes: "바이트 수",
+    th_range: "범위",
+    th_desc: "설명",
+    td_red: "빨강 채널 (14-bit MIDI 안전 인코딩)",
+    td_green: "녹색 채널",
+    td_blue: "파랑 채널",
+    td_same: "동일",
+    td_count: "뒤따르는 키 인덱스의 개수",
+    td_indices: "키 인덱스 (0 = 가장 왼쪽 C3, 35 = 가장 오른쪽 B5)",
+    th_value: "색상 값",
+    th_hex: "16진 바이트",
+    td_off: "(꺼짐)",
+    td_max: "(최대)",
+    proto_layout_h: "5. 건반 배치",
+    th_index: "키 인덱스",
+    th_midi: "MIDI 노트",
+    th_name: "음명",
+    th_position: "위치",
+    td_leftmost: "가장 왼쪽",
+    td_middle: "중앙",
+    td_rightmost: "가장 오른쪽",
+    proto_layout_formula: "공식:",
+    proto_layout_keys: "총 36건반, 3옥타브 (C3–B5).",
+    proto_pp_h1: "1. 팔레트 업로드 (CMD 0x1E)",
+    proto_pp_p1: "N개의 색상을 슬롯 1부터 디바이스 팔레트에 업로드합니다. 색상은 7비트 RGB이며 8비트 값을 <code>min(127, round(v / 2))</code>로 스케일합니다.",
+    proto_pp_h2: "2. 팔레트 슬롯을 키에 할당 (CMD 0x20)",
+    proto_pp_p2: "29건반 각각에 팔레트 슬롯을 할당합니다. <code>lampID</code>는 0–28, <code>paletteSlot</code> 0이면 그 키는 꺼집니다.",
+    proto_pp_tip_label: "팁.",
+    proto_pp_tip_body: " 슬롯 0은 \"꺼짐\"으로 예약되어 있어 덮어쓸 수 없습니다. 팔레트는 전원이 꺼질 때까지 디바이스에 유지되므로, 실시간 색상 변경은 CMD 0x20만 다시 보내면 됩니다 — 필요하면 오디오 속도로도 가능합니다.",
+    side_partykeys: "— PartyKeys 36",
+    qs_callout_label: "이게 전부입니다.",
+    qs_callout_body: " 중요한 건 세 가지: (1) SysEx 권한 요청, (2) \"LED 모드 진입\" 메시지 한 번 전송, (3) 색상을 바꾸고 싶을 때 <code>CMD 15</code> 키별 RGB 메시지 전송. 나머지는 편의 기능.",
+    footer_home: "partykeys.com",
+  },
+  es: {
+    brand_tag: "Protocolo",
+    side_quickstart: "Inicio rápido",
+    side_protocol: "Protocolo",
+    side_popupiano: "— PopuPiano 29",
+    side_sdk: "Ejemplos SDK",
+    side_ai: "Asistente IA",
+    side_prompt: "— Prompt LLM",
+    side_claude_md: "— CLAUDE.md",
+    side_faq: "FAQ",
+    hero_eyebrow: "Código abierto · MIT",
+    hero_title_1: "Ilumina cualquier tecla,",
+    hero_title_2: "desde cualquier lugar.",
+    hero_lead: "La especificación abierta MIDI + SysEx para teclados PartyKeys. Conéctate desde un navegador, un script, o pásala a tu asistente de IA.",
+    hero_cta_start: "Empezar",
+    copy: "Copiar",
+    qs_title: "Inicio rápido en 60 segundos",
+    qs_lead: "Pega esto en la consola DevTools del navegador en cualquier página (Chrome o Edge). Con un PartyKeys 36 conectado por USB, las tres teclas centrales se pondrán roja, verde y azul.",
+    proto_title: "Protocolo",
+    proto_lead: "<strong>PartyKeys 36</strong> — 36 teclas, MIDI 48–83, USB. Solo necesitas tres comandos.",
+    proto_h1: "1. Conectar",
+    proto_p1: "SysEx debe habilitarse explícitamente — sin esto, todos los comandos LED se descartan silenciosamente.",
+    proto_h2: "2. Entrar en modo LED",
+    proto_p2: "Envía una vez después de cada (re)conexión. Los comandos de color enviados antes no tienen efecto.",
+    proto_h3: "3. CMD 15 — RGB por tecla",
+    proto_p3: "Establece cualquier número de teclas en cualquier color RGB de 24 bits en un solo mensaje. Agrupa las teclas que comparten color.",
+    proto_p_color: "<strong>Codificación de color</strong> — MIDI es de 7 bits, así que cada canal 0–255 se divide en un par:",
+    proto_h4: "4. Apagar todo",
+    proto_layout_label: "Disposición de teclas:",
+    proto_layout_body: "<code>midi_note = key_index + 48</code>. Índice 0 = más a la izquierda (C3), 35 = más a la derecha (B5).",
+    proto_warn_label: "Eco de note-on.",
+    proto_warn_body: " La forma antigua de encender una tecla (<code>0x90 note 0x40</code>) hace que el firmware devuelva un note-on como si el intérprete la hubiera pulsado. Usa CMD 15 — no hace eco.",
+    proto_lat_label: "Latencia LED ≈ 200 ms.",
+    proto_lat_body: " No envíes el SysEx antes de tiempo. Envíalo en el tiempo musical y retrasa tu audio + visuales por la misma constante.",
+    proto_pp_h: "PopuPiano 29 (dispositivo alternativo)",
+    proto_pp_lead: "29 teclas, MIDI 48–76, USB o BLE. Dos pasos: subir paleta, asignar slots. No requiere mensaje de \"entrar en modo\".",
+    sdk_title: "Ejemplos SDK",
+    sdk_lead: "La misma tarea en cuatro lenguajes: conectar, inicializar, encender las teclas 17–19 en rojo/verde/azul.",
+    sdk_swift_note: "Enlaza <code>CoreMIDI.framework</code> — sin dependencias de terceros.",
+    ai_title: "Asistente IA",
+    ai_lead: "Dos formas de dar a tu asistente de IA conocimiento completo del protocolo.",
+    ai_prompt_h: "Prompt LLM listo para pegar",
+    ai_prompt_p: "Pégalo en Claude, ChatGPT, Codex, Cursor — donde quieras.",
+    ai_prompt_header: "📋 Pegar en cualquier chat de IA",
+    ai_cmd_h: "Plantilla CLAUDE.md / .cursorrules",
+    ai_cmd_p: "Colócalo en la raíz de tu repo. Claude Code, Cursor y Copilot lo leen automáticamente.",
+    faq_title: "Preguntas frecuentes",
+    faq_1_q: "Mis comandos de color no hacen nada.",
+    faq_1_a: "Tres comprobaciones: (1) <code>{sysex: true}</code> en <code>requestMIDIAccess</code>, (2) enviaste \"entrar en modo LED\" tras conectar, (3) codificaste cada canal de 8 bits como dos bytes de 7 bits. Eso cubre el 99 % de los casos.",
+    faq_2_q: "Los LED van por detrás del audio.",
+    faq_2_a: "El retraso de hardware es de ~150–250 ms. No envíes el SysEx antes — envíalo en el tiempo musical y retrasa audio + visuales ~200 ms (una sola constante).",
+    faq_3_q: "Mi handler de entrada se dispara cuando enciendo una tecla.",
+    faq_3_a: "Estás usando los LEDs note-on antiguos (<code>0x90 note 0x40</code>). El firmware los devuelve como falsa entrada. Cambia a CMD 15 — no hace eco.",
+    faq_4_q: "¿Qué navegadores y SO funcionan?",
+    faq_4_a: "PartyKeys 36 requiere Chrome o Edge (Web MIDI + SysEx). Para Safari/iOS usa el ejemplo Swift. El dispositivo es USB MIDI estándar — sin instalación de drivers.",
+    th_field: "Campo",
+    th_bytes: "Bytes",
+    th_range: "Rango",
+    th_desc: "Descripción",
+    td_red: "Canal rojo (14 bits, seguro para MIDI)",
+    td_green: "Canal verde",
+    td_blue: "Canal azul",
+    td_same: "igual",
+    td_count: "Número de índices de tecla que siguen",
+    td_indices: "Índices de tecla (0 = más a la izquierda C3, 35 = más a la derecha B5)",
+    th_value: "Valor de color",
+    th_hex: "Bytes hex",
+    td_off: "(apagado)",
+    td_max: "(máx.)",
+    proto_layout_h: "5. Disposición de teclas",
+    th_index: "Índice",
+    th_midi: "Nota MIDI",
+    th_name: "Nombre de nota",
+    th_position: "Posición",
+    td_leftmost: "Extrema izq.",
+    td_middle: "Centro",
+    td_rightmost: "Extrema der.",
+    proto_layout_formula: "Fórmula general:",
+    proto_layout_keys: "36 teclas en total, 3 octavas (C3–B5).",
+    proto_pp_h1: "1. Subir una paleta (CMD 0x1E)",
+    proto_pp_p1: "Sube N colores a la paleta del dispositivo a partir del slot 1. Los colores son RGB de 7 bits — escala el valor de 8 bits con <code>min(127, round(v / 2))</code>.",
+    proto_pp_h2: "2. Asignar slots de paleta a teclas (CMD 0x20)",
+    proto_pp_p2: "Asigna un slot de paleta a cada una de las 29 teclas. <code>lampID</code> es 0–28; <code>paletteSlot</code> 0 apaga la tecla.",
+    proto_pp_tip_label: "Consejo.",
+    proto_pp_tip_body: " El slot 0 está reservado como \"apagado\" y no se puede sobrescribir. La paleta permanece en el dispositivo hasta apagarlo, así que para actualizaciones de color en vivo basta con reenviar CMD 0x20 — a frecuencia de audio si hace falta.",
+    side_partykeys: "— PartyKeys 36",
+    qs_callout_label: "Eso es todo.",
+    qs_callout_body: " Tres cosas importan: (1) pedir acceso SysEx, (2) enviar el mensaje \"entrar en modo LED\" una vez, (3) enviar mensajes <code>CMD 15</code> RGB por tecla cuando quieras cambiar las luces. Todo lo demás es comodidad.",
+    footer_home: "partykeys.com",
+  },
+  fr: {
+    brand_tag: "Protocole",
+    side_quickstart: "Démarrage rapide",
+    side_protocol: "Protocole",
+    side_popupiano: "— PopuPiano 29",
+    side_sdk: "Exemples SDK",
+    side_ai: "Assistant IA",
+    side_prompt: "— Prompt LLM",
+    side_claude_md: "— CLAUDE.md",
+    side_faq: "FAQ",
+    hero_eyebrow: "Open Source · MIT",
+    hero_title_1: "Éclairez n'importe quelle touche,",
+    hero_title_2: "depuis n'importe où.",
+    hero_lead: "La spécification ouverte MIDI + SysEx pour les claviers PartyKeys. Connectez-vous depuis un navigateur, un script, ou confiez-la à votre assistant IA.",
+    hero_cta_start: "Commencer",
+    copy: "Copier",
+    qs_title: "Démarrage rapide en 60 secondes",
+    qs_lead: "Collez ceci dans la console DevTools du navigateur, sur n'importe quelle page (Chrome ou Edge). Avec un PartyKeys 36 connecté en USB, les trois touches centrales s'allument en rouge, vert et bleu.",
+    proto_title: "Protocole",
+    proto_lead: "<strong>PartyKeys 36</strong> — 36 touches, MIDI 48–83, USB. Trois commandes suffisent.",
+    proto_h1: "1. Connecter",
+    proto_p1: "SysEx doit être explicitement activé — sans cela, toutes les commandes LED sont ignorées silencieusement.",
+    proto_h2: "2. Entrer en mode LED",
+    proto_p2: "À envoyer une fois après chaque (re)connexion. Les commandes de couleur envoyées avant sont sans effet.",
+    proto_h3: "3. CMD 15 — RGB par touche",
+    proto_p3: "Définissez n'importe quel nombre de touches dans n'importe quelle couleur RGB 24 bits en un seul message. Regroupez les touches partageant une couleur.",
+    proto_p_color: "<strong>Encodage couleur</strong> — MIDI est sur 7 bits, donc chaque canal 0–255 est divisé en deux octets :",
+    proto_h4: "4. Tout éteindre",
+    proto_layout_label: "Disposition des touches :",
+    proto_layout_body: "<code>midi_note = key_index + 48</code>. Index 0 = tout à gauche (C3), 35 = tout à droite (B5).",
+    proto_warn_label: "Écho note-on.",
+    proto_warn_body: " L'ancienne manière d'allumer une touche (<code>0x90 note 0x40</code>) fait que le firmware renvoie un note-on comme si le joueur l'avait appuyée. Utilisez CMD 15 — sans écho.",
+    proto_lat_label: "Latence LED ≈ 200 ms.",
+    proto_lat_body: " N'envoyez pas le SysEx en avance. Envoyez-le sur le temps musical et retardez votre audio + visuels de la même constante.",
+    proto_pp_h: "PopuPiano 29 (autre appareil)",
+    proto_pp_lead: "29 touches, MIDI 48–76, USB ou BLE. Deux étapes : téléverser la palette, attribuer les slots. Pas de message \"entrer en mode\".",
+    sdk_title: "Exemples SDK",
+    sdk_lead: "La même tâche dans quatre langages : connecter, initialiser, allumer les touches 17–19 en rouge/vert/bleu.",
+    sdk_swift_note: "Liez <code>CoreMIDI.framework</code> — sans dépendance tierce.",
+    ai_title: "Assistant IA",
+    ai_lead: "Deux façons de transmettre la connaissance complète du protocole à votre assistant IA.",
+    ai_prompt_h: "Prompt LLM en un clic",
+    ai_prompt_p: "Collez dans Claude, ChatGPT, Codex, Cursor — où vous voulez.",
+    ai_prompt_header: "📋 Coller dans n'importe quel chat IA",
+    ai_cmd_h: "Modèle CLAUDE.md / .cursorrules",
+    ai_cmd_p: "Placez-le à la racine de votre dépôt. Claude Code, Cursor et Copilot le lisent automatiquement.",
+    faq_title: "FAQ",
+    faq_1_q: "Mes commandes de couleur ne font rien.",
+    faq_1_a: "Trois vérifications : (1) <code>{sysex: true}</code> dans <code>requestMIDIAccess</code>, (2) \"entrer en mode LED\" envoyé après connexion, (3) chaque canal 8 bits encodé en deux octets 7 bits. C'est 99 % des cas.",
+    faq_2_q: "Les LED sont en retard sur l'audio.",
+    faq_2_a: "Le délai matériel est d'environ 150–250 ms. N'envoyez pas le SysEx en avance — envoyez-le sur le temps musical, puis retardez audio + visuels d'environ 200 ms (une constante).",
+    faq_3_q: "Mon gestionnaire d'entrée se déclenche quand j'allume une touche.",
+    faq_3_a: "Vous utilisez les LED note-on legacy (<code>0x90 note 0x40</code>). Le firmware les renvoie comme une fausse saisie. Passez à CMD 15 — sans écho.",
+    faq_4_q: "Quels navigateurs / OS sont supportés ?",
+    faq_4_a: "PartyKeys 36 nécessite Chrome ou Edge (Web MIDI + SysEx). Pour Safari/iOS, utilisez l'exemple Swift. L'appareil est un USB MIDI de classe standard — pas d'installation de pilote.",
+    th_field: "Champ",
+    th_bytes: "Octets",
+    th_range: "Plage",
+    th_desc: "Description",
+    td_red: "Canal rouge (14 bits compatible MIDI)",
+    td_green: "Canal vert",
+    td_blue: "Canal bleu",
+    td_same: "idem",
+    td_count: "Nombre d'index de touches qui suivent",
+    td_indices: "Index de touches (0 = tout à gauche C3, 35 = tout à droite B5)",
+    th_value: "Valeur couleur",
+    th_hex: "Octets hex",
+    td_off: "(éteint)",
+    td_max: "(max)",
+    proto_layout_h: "5. Disposition des touches",
+    th_index: "Index",
+    th_midi: "Note MIDI",
+    th_name: "Nom de note",
+    th_position: "Position",
+    td_leftmost: "Tout à gauche",
+    td_middle: "Centre",
+    td_rightmost: "Tout à droite",
+    proto_layout_formula: "Formule générale :",
+    proto_layout_keys: "36 touches au total, 3 octaves (C3–B5).",
+    proto_pp_h1: "1. Téléverser une palette (CMD 0x1E)",
+    proto_pp_p1: "Téléverse N couleurs dans la palette de l'appareil à partir du slot 1. Les couleurs sont en RGB 7 bits — mettre à l'échelle la valeur 8 bits avec <code>min(127, round(v / 2))</code>.",
+    proto_pp_h2: "2. Attribuer les slots de palette aux touches (CMD 0x20)",
+    proto_pp_p2: "Attribue un slot de palette à chacune des 29 touches. <code>lampID</code> vaut 0–28 ; <code>paletteSlot</code> 0 éteint la touche.",
+    proto_pp_tip_label: "Astuce.",
+    proto_pp_tip_body: " Le slot 0 est réservé comme « éteint » et ne peut pas être écrasé. La palette persiste sur l'appareil jusqu'à la mise hors tension — pour des mises à jour de couleur en direct, il suffit de renvoyer CMD 0x20, au tempo audio si nécessaire.",
+    side_partykeys: "— PartyKeys 36",
+    qs_callout_label: "C'est tout.",
+    qs_callout_body: " Trois choses comptent : (1) demander l'accès SysEx, (2) envoyer le message « entrer en mode LED » une fois, (3) envoyer des messages <code>CMD 15</code> RGB par touche quand les lumières doivent changer. Le reste, c'est du confort.",
+    footer_home: "partykeys.com",
+  },
+  de: {
+    brand_tag: "Protokoll",
+    side_quickstart: "Schnellstart",
+    side_protocol: "Protokoll",
+    side_popupiano: "— PopuPiano 29",
+    side_sdk: "SDK-Beispiele",
+    side_ai: "KI-Assistent",
+    side_prompt: "— LLM-Prompt",
+    side_claude_md: "— CLAUDE.md",
+    side_faq: "FAQ",
+    hero_eyebrow: "Open Source · MIT",
+    hero_title_1: "Bring jede Taste zum Leuchten,",
+    hero_title_2: "von überall aus.",
+    hero_lead: "Die offene MIDI- + SysEx-Spezifikation für PartyKeys-Keyboards. Verbinde dich vom Browser, einem Skript oder übergib sie deinem KI-Assistenten.",
+    hero_cta_start: "Start",
+    copy: "Kopieren",
+    qs_title: "60-Sekunden-Schnellstart",
+    qs_lead: "Füge dies in die DevTools-Konsole des Browsers auf einer beliebigen Seite ein (Chrome oder Edge). Mit einem PartyKeys 36 per USB werden die mittleren drei Tasten rot, grün und blau.",
+    proto_title: "Protokoll",
+    proto_lead: "<strong>PartyKeys 36</strong> — 36 Tasten, MIDI 48–83, USB. Drei Befehle sind alles, was du brauchst.",
+    proto_h1: "1. Verbinden",
+    proto_p1: "SysEx muss explizit aktiviert werden — ohne das werden alle LED-Befehle stillschweigend verworfen.",
+    proto_h2: "2. LED-Modus aktivieren",
+    proto_p2: "Einmal nach jeder (Wieder-)Verbindung senden. Vorher gesendete Farbbefehle haben keine Wirkung.",
+    proto_h3: "3. CMD 15 — RGB pro Taste",
+    proto_p3: "Setze beliebig viele Tasten in einer Nachricht auf eine beliebige 24-Bit-RGB-Farbe. Tasten mit gleicher Farbe gruppieren.",
+    proto_p_color: "<strong>Farbcodierung</strong> — MIDI ist 7-Bit, daher wird jeder 0–255-Kanal in ein Paar aufgeteilt:",
+    proto_h4: "4. Alles aus",
+    proto_layout_label: "Tastenbelegung:",
+    proto_layout_body: "<code>midi_note = key_index + 48</code>. Index 0 = ganz links (C3), 35 = ganz rechts (B5).",
+    proto_warn_label: "Note-on-Echo.",
+    proto_warn_body: " Die alte Methode zum Beleuchten einer Taste (<code>0x90 note 0x40</code>) sorgt dafür, dass die Firmware ein Note-on zurückspiegelt, als hätte der Spieler die Taste gedrückt. Verwende CMD 15 — kein Echo.",
+    proto_lat_label: "LED-Latenz ≈ 200 ms.",
+    proto_lat_body: " Sende das SysEx nicht im Voraus. Sende es zum Beat und verzögere Audio + Visuals um dieselbe Konstante.",
+    proto_pp_h: "PopuPiano 29 (alternatives Gerät)",
+    proto_pp_lead: "29 Tasten, MIDI 48–76, USB oder BLE. Zwei Schritte: Palette hochladen, Slots zuweisen. Keine \"Modus aktivieren\"-Nachricht nötig.",
+    sdk_title: "SDK-Beispiele",
+    sdk_lead: "Dieselbe Aufgabe in vier Sprachen: verbinden, initialisieren, Tasten 17–19 in Rot/Grün/Blau leuchten lassen.",
+    sdk_swift_note: "<code>CoreMIDI.framework</code> linken — keine Drittabhängigkeiten.",
+    ai_title: "KI-Assistent",
+    ai_lead: "Zwei Wege, deinem KI-Assistenten volles Protokollwissen zu geben.",
+    ai_prompt_h: "LLM-Prompt zum Einfügen",
+    ai_prompt_p: "Füge in Claude, ChatGPT, Codex oder Cursor ein — überall.",
+    ai_prompt_header: "📋 In jeden KI-Chat einfügen",
+    ai_cmd_h: "CLAUDE.md / .cursorrules Vorlage",
+    ai_cmd_p: "Lege es ins Repo-Root. Claude Code, Cursor und Copilot lesen es automatisch.",
+    faq_title: "FAQ",
+    faq_1_q: "Meine Farbbefehle bewirken nichts.",
+    faq_1_a: "Drei Prüfungen: (1) <code>{sysex: true}</code> in <code>requestMIDIAccess</code>, (2) \"LED-Modus aktivieren\" nach dem Verbinden gesendet, (3) jeden 8-Bit-Kanal als zwei 7-Bit-Bytes codiert. Das sind 99 % der Fälle.",
+    faq_2_q: "Die LEDs hängen hinter dem Audio.",
+    faq_2_a: "Hardware-Verzögerung beträgt ca. 150–250 ms. Sende das SysEx nicht im Voraus — sende es zum Beat und verzögere Audio + Visuals um ca. 200 ms (eine Konstante).",
+    faq_3_q: "Mein Input-Handler löst aus, wenn ich eine Taste leuchten lasse.",
+    faq_3_a: "Du verwendest die alten Note-on-LEDs (<code>0x90 note 0x40</code>). Die Firmware spiegelt diese als gefälschten Spielereingang zurück. Wechsle zu CMD 15 — kein Echo.",
+    faq_4_q: "Welche Browser / Betriebssysteme funktionieren?",
+    faq_4_a: "PartyKeys 36 benötigt Chrome oder Edge (Web MIDI + SysEx). Für Safari/iOS verwende das Swift-Beispiel. Das Gerät ist klassenkonformes USB MIDI — keine Treiberinstallation.",
+    th_field: "Feld",
+    th_bytes: "Bytes",
+    th_range: "Bereich",
+    th_desc: "Beschreibung",
+    td_red: "Rot-Kanal (14-Bit, MIDI-sicher)",
+    td_green: "Grün-Kanal",
+    td_blue: "Blau-Kanal",
+    td_same: "wie oben",
+    td_count: "Anzahl der folgenden Tastenindizes",
+    td_indices: "Tastenindizes (0 = ganz links C3, 35 = ganz rechts B5)",
+    th_value: "Farbwert",
+    th_hex: "Hex-Bytes",
+    td_off: "(aus)",
+    td_max: "(max.)",
+    proto_layout_h: "5. Tastenbelegung",
+    th_index: "Tastenindex",
+    th_midi: "MIDI-Note",
+    th_name: "Notenname",
+    th_position: "Position",
+    td_leftmost: "Ganz links",
+    td_middle: "Mitte",
+    td_rightmost: "Ganz rechts",
+    proto_layout_formula: "Allgemeine Formel:",
+    proto_layout_keys: "Insgesamt 36 Tasten, 3 Oktaven (C3–B5).",
+    proto_pp_h1: "1. Palette hochladen (CMD 0x1E)",
+    proto_pp_p1: "Lädt N Farben in die Geräte-Palette ab Slot 1. Farben sind 7-Bit-RGB — skaliere 8-Bit-Werte mit <code>min(127, round(v / 2))</code>.",
+    proto_pp_h2: "2. Paletten-Slots Tasten zuweisen (CMD 0x20)",
+    proto_pp_p2: "Weist jeder der 29 Tasten einen Paletten-Slot zu. <code>lampID</code> ist 0–28; <code>paletteSlot</code> 0 schaltet die Taste aus.",
+    proto_pp_tip_label: "Tipp.",
+    proto_pp_tip_body: " Slot 0 ist als „aus\" reserviert und kann nicht überschrieben werden. Die Palette bleibt bis zum Stromausfall im Gerät erhalten — für Live-Farbänderungen reicht es, CMD 0x20 neu zu senden, bei Bedarf in Audio-Frequenz.",
+    side_partykeys: "— PartyKeys 36",
+    qs_callout_label: "Das war's.",
+    qs_callout_body: " Drei Dinge sind wichtig: (1) SysEx-Zugriff anfordern, (2) die \"LED-Modus aktivieren\"-Nachricht einmal senden, (3) <code>CMD 15</code>-RGB-Nachrichten pro Taste senden, wann immer die Lichter wechseln sollen. Alles andere ist Komfort.",
+    footer_home: "partykeys.com",
+  },
+  pt: {
+    brand_tag: "Protocolo",
+    side_quickstart: "Início rápido",
+    side_protocol: "Protocolo",
+    side_popupiano: "— PopuPiano 29",
+    side_sdk: "Exemplos SDK",
+    side_ai: "Assistente IA",
+    side_prompt: "— Prompt LLM",
+    side_claude_md: "— CLAUDE.md",
+    side_faq: "FAQ",
+    hero_eyebrow: "Código aberto · MIT",
+    hero_title_1: "Acenda qualquer tecla,",
+    hero_title_2: "de qualquer lugar.",
+    hero_lead: "A especificação aberta MIDI + SysEx para teclados PartyKeys. Conecte do navegador, de um script, ou entregue ao seu assistente de IA.",
+    hero_cta_start: "Começar",
+    copy: "Copiar",
+    qs_title: "Início rápido em 60 segundos",
+    qs_lead: "Cole isso no console DevTools do navegador em qualquer página (Chrome ou Edge). Com um PartyKeys 36 conectado via USB, as três teclas centrais ficarão vermelha, verde e azul.",
+    proto_title: "Protocolo",
+    proto_lead: "<strong>PartyKeys 36</strong> — 36 teclas, MIDI 48–83, USB. Três comandos bastam.",
+    proto_h1: "1. Conectar",
+    proto_p1: "SysEx precisa ser explicitamente habilitado — sem isso, todos os comandos LED são descartados silenciosamente.",
+    proto_h2: "2. Entrar no modo LED",
+    proto_p2: "Envie uma vez após cada (re)conexão. Comandos de cor enviados antes não têm efeito.",
+    proto_h3: "3. CMD 15 — RGB por tecla",
+    proto_p3: "Define qualquer número de teclas em qualquer cor RGB de 24 bits em uma única mensagem. Agrupe teclas com a mesma cor.",
+    proto_p_color: "<strong>Codificação de cor</strong> — MIDI é 7-bit, então cada canal 0–255 é dividido em um par:",
+    proto_h4: "4. Apagar tudo",
+    proto_layout_label: "Layout das teclas:",
+    proto_layout_body: "<code>midi_note = key_index + 48</code>. Índice 0 = mais à esquerda (C3), 35 = mais à direita (B5).",
+    proto_warn_label: "Eco de note-on.",
+    proto_warn_body: " A forma antiga de acender uma tecla (<code>0x90 note 0x40</code>) faz o firmware ecoar um note-on como se o tocador tivesse pressionado. Use CMD 15 — não ecoa.",
+    proto_lat_label: "Latência LED ≈ 200 ms.",
+    proto_lat_body: " Não envie o SysEx adiantado. Envie-o no tempo musical e atrase seu áudio + visual pela mesma constante.",
+    proto_pp_h: "PopuPiano 29 (dispositivo alternativo)",
+    proto_pp_lead: "29 teclas, MIDI 48–76, USB ou BLE. Dois passos: enviar paleta, atribuir slots. Sem mensagem de \"entrar no modo\".",
+    sdk_title: "Exemplos SDK",
+    sdk_lead: "A mesma tarefa em quatro linguagens: conectar, inicializar, acender as teclas 17–19 em vermelho/verde/azul.",
+    sdk_swift_note: "Linke <code>CoreMIDI.framework</code> — sem dependências de terceiros.",
+    ai_title: "Assistente IA",
+    ai_lead: "Duas formas de dar ao seu assistente de IA o conhecimento completo do protocolo.",
+    ai_prompt_h: "Prompt LLM em um clique",
+    ai_prompt_p: "Cole no Claude, ChatGPT, Codex, Cursor — em qualquer lugar.",
+    ai_prompt_header: "📋 Cole em qualquer chat de IA",
+    ai_cmd_h: "Modelo CLAUDE.md / .cursorrules",
+    ai_cmd_p: "Coloque na raiz do seu repo. Claude Code, Cursor e Copilot leem automaticamente.",
+    faq_title: "Perguntas frequentes",
+    faq_1_q: "Meus comandos de cor não fazem nada.",
+    faq_1_a: "Três verificações: (1) <code>{sysex: true}</code> em <code>requestMIDIAccess</code>, (2) enviou \"entrar no modo LED\" após conectar, (3) codificou cada canal de 8 bits como dois bytes de 7 bits. Cobre 99 % dos casos.",
+    faq_2_q: "Os LEDs estão atrás do áudio.",
+    faq_2_a: "O atraso de hardware é de ~150–250 ms. Não envie o SysEx adiantado — envie no tempo musical, depois atrase áudio + visual em ~200 ms (uma constante).",
+    faq_3_q: "Meu handler de entrada dispara quando acendo uma tecla.",
+    faq_3_a: "Você está usando LEDs note-on antigos (<code>0x90 note 0x40</code>). O firmware os ecoa como entrada falsa do tocador. Mude para CMD 15 — não ecoa.",
+    faq_4_q: "Quais navegadores / SOs funcionam?",
+    faq_4_a: "PartyKeys 36 precisa de Chrome ou Edge (Web MIDI + SysEx). Para Safari/iOS, use o exemplo em Swift. O dispositivo é USB MIDI padrão — sem instalação de driver.",
+    th_field: "Campo",
+    th_bytes: "Bytes",
+    th_range: "Faixa",
+    th_desc: "Descrição",
+    td_red: "Canal vermelho (14 bits, MIDI-safe)",
+    td_green: "Canal verde",
+    td_blue: "Canal azul",
+    td_same: "idem",
+    td_count: "Número de índices de tecla que seguem",
+    td_indices: "Índices de tecla (0 = mais à esquerda C3, 35 = mais à direita B5)",
+    th_value: "Valor da cor",
+    th_hex: "Bytes hex",
+    td_off: "(apagado)",
+    td_max: "(máx.)",
+    proto_layout_h: "5. Layout das teclas",
+    th_index: "Índice",
+    th_midi: "Nota MIDI",
+    th_name: "Nome da nota",
+    th_position: "Posição",
+    td_leftmost: "Mais à esquerda",
+    td_middle: "Centro",
+    td_rightmost: "Mais à direita",
+    proto_layout_formula: "Fórmula geral:",
+    proto_layout_keys: "36 teclas no total, 3 oitavas (C3–B5).",
+    proto_pp_h1: "1. Enviar uma paleta (CMD 0x1E)",
+    proto_pp_p1: "Envia N cores para a paleta do dispositivo a partir do slot 1. As cores são RGB de 7 bits — escale o valor de 8 bits com <code>min(127, round(v / 2))</code>.",
+    proto_pp_h2: "2. Atribuir slots de paleta às teclas (CMD 0x20)",
+    proto_pp_p2: "Atribui um slot de paleta a cada uma das 29 teclas. <code>lampID</code> é 0–28; <code>paletteSlot</code> 0 apaga a tecla.",
+    proto_pp_tip_label: "Dica.",
+    proto_pp_tip_body: " O slot 0 é reservado como \"apagado\" e não pode ser sobrescrito. A paleta persiste no dispositivo até desligar — para atualizações de cor ao vivo basta reenviar CMD 0x20, em frequência de áudio se preciso.",
+    side_partykeys: "— PartyKeys 36",
+    qs_callout_label: "É só isso.",
+    qs_callout_body: " Três coisas importam: (1) pedir acesso SysEx, (2) enviar a mensagem \"entrar no modo LED\" uma vez, (3) enviar mensagens <code>CMD 15</code> RGB por tecla sempre que quiser mudar as luzes. Tudo o mais é conveniência.",
+    footer_home: "partykeys.com",
+  }
+};
+
+const LANG_HTML = { en: 'en', zh: 'zh-CN', ja: 'ja', ko: 'ko', es: 'es', fr: 'fr', de: 'de', pt: 'pt-BR' };
+
+function setLang(lang) {
+  if (!i18n[lang]) lang = 'en';
+  document.documentElement.setAttribute('data-lang', lang);
+  document.documentElement.lang = LANG_HTML[lang] || lang;
+  const dict = i18n[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key] !== undefined) el.innerHTML = dict[key];
+  });
+  const sel = document.getElementById('lang-select');
+  if (sel && sel.value !== lang) sel.value = lang;
+  try { localStorage.setItem('pk-doc-lang', lang); } catch(_) {}
+}
+
+document.getElementById('lang-select').addEventListener('change', e => setLang(e.target.value));
+
+// Default English. Only switch if a previously chosen language is saved.
+let initial = 'en';
+try {
+  const saved = localStorage.getItem('pk-doc-lang');
+  if (saved && i18n[saved]) initial = saved;
+} catch(_) {}
+setLang(initial);
+
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tab));
+  });
+});
+
+// Copy buttons
+const COPIED_LABEL = {
+  en: '✓ Copied', zh: '✓ 已复制', ja: '✓ コピー済み', ko: '✓ 복사됨',
+  es: '✓ Copiado', fr: '✓ Copié', de: '✓ Kopiert', pt: '✓ Copiado'
+};
+function attachCopy(btn) {
+  btn.addEventListener('click', async () => {
+    const id = btn.getAttribute('data-copy-target');
+    const target = document.getElementById(id);
+    if (!target) return;
+    try {
+      await navigator.clipboard.writeText(target.innerText);
+      btn.classList.add('copied');
+      const original = btn.innerHTML;
+      const lang = document.documentElement.getAttribute('data-lang') || 'en';
+      btn.innerHTML = COPIED_LABEL[lang] || COPIED_LABEL.en;
+      setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = original; }, 1500);
+    } catch (err) { console.error('Copy failed', err); }
+  });
+}
+document.querySelectorAll('.copy-btn, #copy-llm-prompt').forEach(attachCopy);
+
+// Active sidebar link on scroll
+const sections = ['introduction','quickstart','protocol','sdk','ai','faq']
+  .map(id => document.getElementById(id)).filter(Boolean);
+const sidebarLinks = document.querySelectorAll('.sidebar-link');
+function updateActive() {
+  const y = window.scrollY + 100;
+  let current = sections[0]?.id;
+  for (const s of sections) if (s.offsetTop <= y) current = s.id;
+  sidebarLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + current));
+}
+window.addEventListener('scroll', updateActive, { passive: true });
+updateActive();
+
+// Highlight
+window.addEventListener('load', () => {
+  if (window.hljs) document.querySelectorAll('.code-block pre code').forEach(el => hljs.highlightElement(el));
+});
+</script>
+</body>
+</html>
