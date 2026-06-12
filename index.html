@@ -477,7 +477,56 @@ const enc = v =&gt; [Math.floor(v / 128), v % 128];
         </tbody>
       </table>
 
-      <h4 data-i18n="proto_h4">4. All off</h4>
+      <h4 data-i18n="proto_h_hl">4. CMD 0x14 — Highlight / Darklight</h4>
+      <p data-i18n="proto_p_hl">Higher-level lighting that references a pre-loaded UI palette (<code>paletteUI_k[]</code>) on the device. Two semantic states for guided-play scenarios (chord trainers, sight-reading, sequencer playback) — <strong>Highlight</strong> for the key the player should press <em>now</em>, <strong>Darklight</strong> as a dimmer preview of the upcoming key.</p>
+      <table class="doc-table">
+        <thead><tr>
+          <th data-i18n="th_state">State</th>
+          <th data-i18n="th_command">Command</th>
+          <th data-i18n="th_slot">Palette slot</th>
+          <th data-i18n="th_brightness">Brightness</th>
+          <th data-i18n="th_use">Typical use</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><strong>Highlight</strong> <span style="color:var(--text-soft)">(高亮)</span></td><td><code>Send_LightUp (0x14)</code></td><td><code>paletteUI_k[n]</code></td><td>× 1.0</td><td data-i18n="td_hl_use">The key the player should press now</td></tr>
+          <tr><td><strong>Darklight</strong> <span style="color:var(--text-soft)">(预亮)</span></td><td><code>Send_LightUp (0x14)</code></td><td><code>paletteUI_k[n+14]</code></td><td>× 0.75</td><td data-i18n="td_dl_use">Next upcoming key, dimmed as a preview</td></tr>
+        </tbody>
+      </table>
+
+      <p style="margin-top:20px" data-i18n="proto_palette_h"><strong>Palette layout (28 slots).</strong> The UI palette is structured as:</p>
+      <table class="doc-table">
+        <thead><tr>
+          <th data-i18n="th_slots">Slots</th>
+          <th data-i18n="th_color_group">Color group</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><code>0</code></td><td data-i18n="td_palette_off">Black (off)</td></tr>
+          <tr><td><code>1 – 12</code></td><td data-i18n="td_palette_hl">Highlight colors — full brightness × 1.0</td></tr>
+          <tr><td><code>13</code></td><td data-i18n="td_palette_off2">Black (off)</td></tr>
+          <tr><td><code>14 – 25</code></td><td data-i18n="td_palette_dl">Darklight colors — dim × 0.75 (same hues as 1–12)</td></tr>
+          <tr><td><code>26, 27</code></td><td data-i18n="td_palette_white">White</td></tr>
+        </tbody>
+      </table>
+
+      <p style="margin-top:20px" data-i18n="proto_wire_h"><strong>Wire format.</strong> Both states are emitted as CMD <code>0x71</code> palette assignment. To light an entire C3 octave (keys 48–59) at Highlight or Darklight:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SysEx · CMD 0x71 — one-octave Highlight + Darklight</span>
+          <button class="copy-btn" data-copy-target="p-hldl"><span data-i18n="copy">Copy</span></button>
+        </div>
+<pre><code class="language-plaintext" id="p-hldl"># Highlight one C3 octave — palette slots 1–12 (full brightness × 1.0)
+F0 05 30 7F 3F 20 00 71 0C
+  30 01  31 02  32 03  33 04  34 05  35 06
+  36 07  37 08  38 09  39 0A  3A 0B  3B 0C
+F7
+
+# Darklight the same keys — palette slots 14–25 (dim × 0.75, same hues)
+F0 05 30 7F 3F 20 00 71 0C
+  30 0E  31 0F  32 10  33 11  34 12  35 13
+  36 14  37 15  38 16  39 17  3A 18  3B 19
+F7</code></pre>
+      </div>
+
+      <h4 data-i18n="proto_h4">5. All off</h4>
       <div class="code-block">
         <div class="code-header"><span class="code-lang">SysEx</span>
           <button class="copy-btn" data-copy-target="p-off"><span data-i18n="copy">Copy</span></button>
@@ -485,7 +534,7 @@ const enc = v =&gt; [Math.floor(v / 128), v % 128];
 <pre><code class="language-plaintext" id="p-off">F0 05 30 7F 7F 20 00 71 00 F7</code></pre>
       </div>
 
-      <h4 id="key-layout" style="margin-top:30px" data-i18n="proto_layout_h">5. Key layout</h4>
+      <h4 id="key-layout" style="margin-top:30px" data-i18n="proto_layout_h">6. Key layout</h4>
       <table class="doc-table">
         <thead><tr>
           <th data-i18n="th_index">Key index</th>
@@ -740,13 +789,38 @@ PROTOCOL:
      high = floor(v / 128)    low = v % 128
      255 = [0x01, 0x7F]   128 = [0x01, 0x00]   0 = [0x00, 0x00]
 
-3. All off:
+3. Send_LightUp (0x14) — Highlight / Darklight (palette mode):
+   • Higher-level than CMD 15 — references the device's UI palette (paletteUI_k[]).
+   • Two semantic states (high-level API):
+       Highlight (高亮): paletteUI_k[n]      × brightness 1.0  → key to press NOW
+       Darklight (预亮): paletteUI_k[n+14]  × brightness 0.75 → upcoming key (dimmer preview)
+   • Palette layout (28 slots):
+       0      → black (off)
+       1–12   → highlight colors (full brightness)
+       13     → black (off)
+       14–25  → darklight colors (dim 0.75, same hues as 1–12)
+       26, 27 → white
+   • On the wire: CMD 0x71 palette assignment. Example — Highlight one C3 octave
+     (keys 48–59, palette slots 1–12):
+       F0 05 30 7F 3F 20 00 71 0C
+         30 01  31 02  32 03  33 04  34 05  35 06
+         36 07  37 08  38 09  39 0A  3A 0B  3B 0C
+       F7
+     Same keys at Darklight (slots 14–25):
+       F0 05 30 7F 3F 20 00 71 0C
+         30 0E  31 0F  32 10  33 11  34 12  35 13
+         36 14  37 15  38 16  39 17  3A 18  3B 19
+       F7
+   • Use for chord trainers, sight-reading, sequencer playback — anywhere you want a
+     "now" vs "next" two-state visual cue.
+
+4. All off:
    F0 05 30 7F 7F 20 00 71 00 F7
 
-4. CMD 15 does NOT echo. Legacy note-on LEDs (0x90 note 0x40) DO echo
+5. CMD 15 does NOT echo. Legacy note-on LEDs (0x90 note 0x40) DO echo
    back to your input handler — always prefer CMD 15.
 
-5. Hardware LED latency ~200 ms. To sync with audio: fire SysEx at the
+6. Hardware LED latency ~200 ms. To sync with audio: fire SysEx at the
    beat, delay audio + visuals by ~200 ms.
 
 ═══ DEVICE B — PopuPiano 29 ═══
@@ -811,6 +885,16 @@ F0 05 30 7F 7F 20 00 15 &lt;numGroups&gt;
   &lt;R_hi R_lo G_hi G_lo B_hi B_lo keyCount key0 key1 ...&gt; × N
 F7
 ```
+
+Send_LightUp (0x14) — Highlight / Darklight (palette mode, optional):
+- Two semantic states share `Send_LightUp`; both index the device's UI palette `paletteUI_k[]`:
+  - Highlight (高亮): `paletteUI_k[n]`     × brightness 1.0  — key to press now
+  - Darklight (预亮): `paletteUI_k[n+14]` × brightness 0.75 — upcoming key (preview)
+- Palette (28 slots): 0 & 13 = black, 1–12 = highlight (full brightness),
+  14–25 = darklight (dim 0.75, same hues as 1–12), 26 & 27 = white.
+- On the wire: CMD `0x71` palette assignment. Example — Highlight C3 octave:
+  `F0 05 30 7F 3F 20 00 71 0C 30 01 31 02 32 03 33 04 34 05 35 06 36 07 37 08 38 09 39 0A 3A 0B 3B 0C F7`
+- Use for chord trainers, sight-reading, sequencer playback.
 
 All off: `F0 05 30 7F 7F 20 00 71 00 F7`
 
@@ -893,7 +977,7 @@ const i18n = {
     proto_h3: "3. CMD 15 — per-key RGB",
     proto_p3: "Set any number of keys to any 24-bit RGB color in one message. Group keys that share a color.",
     proto_p_color: "<strong>Color encoding</strong> — MIDI is 7-bit, so each 0–255 channel splits into a pair:",
-    proto_h4: "4. All off",
+    proto_h4: "5. All off",
     proto_layout_label: "Key layout:",
     proto_layout_body: "<code>midi_note = key_index + 48</code>. Index 0 = leftmost (C3), 35 = rightmost (B5).",
     proto_warn_label: "Note-on echo.",
@@ -935,7 +1019,7 @@ const i18n = {
     th_hex: "Hex bytes",
     td_off: "(off)",
     td_max: "(max)",
-    proto_layout_h: "5. Key layout",
+    proto_layout_h: "6. Key layout",
     th_index: "Key index",
     th_midi: "MIDI note",
     th_name: "Note name",
@@ -954,6 +1038,24 @@ const i18n = {
     side_partykeys: "— PartyKeys 36",
     qs_callout_label: "That's it.",
     qs_callout_body: " Three things matter: (1) ask for SysEx access, (2) send the \"enter LED mode\" message once, (3) send <code>CMD 15</code> per-key RGB messages whenever the lights should change. Everything else is convenience.",
+    proto_h_hl: "4. CMD 0x14 — Highlight / Darklight",
+    proto_p_hl: "Higher-level lighting that references a pre-loaded UI palette (<code>paletteUI_k[]</code>) on the device. Two semantic states for guided-play scenarios (chord trainers, sight-reading, sequencer playback) — <strong>Highlight</strong> for the key the player should press <em>now</em>, <strong>Darklight</strong> as a dimmer preview of the upcoming key. On the wire, <code>Send_LightUp</code> is implemented as a CMD <code>0x71</code> palette assignment.",
+    th_state: "State",
+    th_command: "Command",
+    th_slot: "Palette slot",
+    th_brightness: "Brightness",
+    th_use: "Typical use",
+    td_hl_use: "The key the player should press now",
+    td_dl_use: "Next upcoming key, dimmed as a preview",
+    proto_palette_h: "<strong>Palette layout (28 slots).</strong> The UI palette is structured as:",
+    th_slots: "Slots",
+    th_color_group: "Color group",
+    td_palette_off: "Black (off)",
+    td_palette_off2: "Black (off)",
+    td_palette_hl: "Highlight colors — full brightness × 1.0",
+    td_palette_dl: "Darklight colors — dim × 0.75 (same hues as 1–12)",
+    td_palette_white: "White",
+    proto_wire_h: "<strong>Wire format.</strong> Both states are emitted as CMD <code>0x71</code> palette assignment. To light an entire C3 octave (keys 48–59) at Highlight or Darklight:",
     footer_home: "partykeys.com",
   },
   zh: {
@@ -983,7 +1085,7 @@ const i18n = {
     proto_h3: "3. CMD 15 — 每键 RGB",
     proto_p3: "一条消息把任意数量琴键设为任意 24-bit RGB 颜色。同色琴键归到一组。",
     proto_p_color: "<strong>颜色编码</strong> —— MIDI 数据字节是 7-bit，所以每个 0–255 通道要拆成 high/low 一对：",
-    proto_h4: "4. 全部熄灭",
+    proto_h4: "5. 全部熄灭",
     proto_layout_label: "琴键布局：",
     proto_layout_body: "<code>midi_note = key_index + 48</code>。索引 0 = 最左 (C3)，35 = 最右 (B5)。",
     proto_warn_label: "Note-on 会回声。",
@@ -1025,7 +1127,7 @@ const i18n = {
     th_hex: "十六进制字节",
     td_off: "（熄灭）",
     td_max: "（最大）",
-    proto_layout_h: "5. 琴键布局",
+    proto_layout_h: "6. 琴键布局",
     th_index: "琴键索引",
     th_midi: "MIDI 音符",
     th_name: "音名",
@@ -1044,6 +1146,24 @@ const i18n = {
     side_partykeys: "— PartyKeys 36",
     qs_callout_label: "就这么简单。",
     qs_callout_body: " 三件事最关键：（1）请求 SysEx 权限，（2）发送一次「进入 LED 模式」指令，（3）需要变化时发 <code>CMD 15</code> 每键 RGB 指令。其他的都只是封装。",
+    proto_h_hl: "4. CMD 0x14 —— 高亮 / 预亮",
+    proto_p_hl: "基于调色板的高层灯光命令，引用设备内预加载的 UI 调色板（<code>paletteUI_k[]</code>）。为引导式演奏场景（和弦训练、视奏、伴奏跟弹）提供两种语义状态——<strong>Highlight（高亮）</strong> 是玩家<em>当下</em>该按的琴键，<strong>Darklight（预亮）</strong> 是下一个即将按的琴键的暗版预览。在线缆层面，<code>Send_LightUp</code> 实际是用 CMD <code>0x71</code> 调色板分配命令实现的。",
+    th_state: "状态",
+    th_command: "命令",
+    th_slot: "调色板槽位",
+    th_brightness: "亮度",
+    th_use: "典型用途",
+    td_hl_use: "玩家当下该按的琴键",
+    td_dl_use: "下一个即将按的琴键，暗版预览",
+    proto_palette_h: "<strong>调色板布局（28 个槽位）。</strong>UI 调色板的结构是：",
+    th_slots: "槽位",
+    th_color_group: "颜色组",
+    td_palette_off: "黑色（熄灭）",
+    td_palette_off2: "黑色（熄灭）",
+    td_palette_hl: "Highlight 高亮色——满亮度 × 1.0",
+    td_palette_dl: "Darklight 预亮色——暗 × 0.75（与 1–12 同色相）",
+    td_palette_white: "白色",
+    proto_wire_h: "<strong>线缆格式。</strong>两种状态在线缆上都是用 CMD <code>0x71</code> 调色板分配命令发出去的。点亮整个 C3 八度（键 48–59）的 Highlight 或 Darklight：",
     footer_home: "partykeys.com",
   },
   ja: {
@@ -1073,7 +1193,7 @@ const i18n = {
     proto_h3: "3. CMD 15 — キー単位の RGB",
     proto_p3: "1 つのメッセージで、任意の数のキーを任意の 24-bit RGB カラーに設定できます。同じ色のキーは 1 グループにまとめてください。",
     proto_p_color: "<strong>カラーエンコーディング</strong> — MIDI は 7-bit なので、0–255 の各チャンネルは high/low のペアに分割します：",
-    proto_h4: "4. 全消灯",
+    proto_h4: "5. 全消灯",
     proto_layout_label: "鍵盤レイアウト：",
     proto_layout_body: "<code>midi_note = key_index + 48</code>。インデックス 0 = 最左端 (C3)、35 = 最右端 (B5)。",
     proto_warn_label: "Note-on のエコー。",
@@ -1115,7 +1235,7 @@ const i18n = {
     th_hex: "16進バイト",
     td_off: "（消灯）",
     td_max: "（最大）",
-    proto_layout_h: "5. 鍵盤レイアウト",
+    proto_layout_h: "6. 鍵盤レイアウト",
     th_index: "キーインデックス",
     th_midi: "MIDI ノート",
     th_name: "音名",
@@ -1134,6 +1254,24 @@ const i18n = {
     side_partykeys: "— PartyKeys 36",
     qs_callout_label: "これだけ。",
     qs_callout_body: " 重要なのは 3 つだけ：（1）SysEx アクセスを要求する、（2）「LED モードに入る」メッセージを 1 回送る、（3）色を変えたいときに <code>CMD 15</code> のキー単位 RGB メッセージを送る。残りはすべて便利機能。",
+    proto_h_hl: "4. CMD 0x14 — Highlight / Darklight",
+    proto_p_hl: "デバイス内に事前にロードされた UI パレット（<code>paletteUI_k[]</code>）を参照する、より高レベルのライティングコマンド。ガイド演奏（コードトレーナー、初見奏、シーケンサー再生）向けに 2 つの状態を提供 ―― <strong>Highlight</strong> はプレイヤーが<em>今</em>押すべきキー、<strong>Darklight</strong>（プリライト）は次に押すキーの暗めのプレビュー。ワイヤ上では <code>Send_LightUp</code> は CMD <code>0x71</code> パレット割り当てとして実装されています。",
+    th_state: "状態",
+    th_command: "コマンド",
+    th_slot: "パレットスロット",
+    th_brightness: "明るさ",
+    th_use: "用途",
+    td_hl_use: "プレイヤーが今押すべきキー",
+    td_dl_use: "次に押すキー、暗めのプレビュー",
+    proto_palette_h: "<strong>パレットレイアウト（28 スロット）。</strong>UI パレットの構造：",
+    th_slots: "スロット",
+    th_color_group: "カラーグループ",
+    td_palette_off: "黒（消灯）",
+    td_palette_off2: "黒（消灯）",
+    td_palette_hl: "Highlight ハイライト色 — 最大輝度 × 1.0",
+    td_palette_dl: "Darklight プリライト色 — 暗 × 0.75（1–12 と同じ色相）",
+    td_palette_white: "白",
+    proto_wire_h: "<strong>ワイヤ形式。</strong>両方の状態はワイヤ上では CMD <code>0x71</code> パレット割り当てとして送信されます。C3 オクターブ全体（キー 48–59）を Highlight または Darklight で点灯：",
     footer_home: "partykeys.com",
   },
   ko: {
@@ -1163,7 +1301,7 @@ const i18n = {
     proto_h3: "3. CMD 15 — 키별 RGB",
     proto_p3: "메시지 하나로 원하는 만큼의 키를 24-bit RGB 색상으로 설정합니다. 같은 색의 키는 한 그룹으로 묶으세요.",
     proto_p_color: "<strong>색상 인코딩</strong> — MIDI는 7비트이므로 0–255 각 채널은 high/low 쌍으로 나누어야 합니다:",
-    proto_h4: "4. 모두 끄기",
+    proto_h4: "5. 모두 끄기",
     proto_layout_label: "건반 배치:",
     proto_layout_body: "<code>midi_note = key_index + 48</code>. 인덱스 0 = 가장 왼쪽 (C3), 35 = 가장 오른쪽 (B5).",
     proto_warn_label: "Note-on 에코.",
@@ -1205,7 +1343,7 @@ const i18n = {
     th_hex: "16진 바이트",
     td_off: "(꺼짐)",
     td_max: "(최대)",
-    proto_layout_h: "5. 건반 배치",
+    proto_layout_h: "6. 건반 배치",
     th_index: "키 인덱스",
     th_midi: "MIDI 노트",
     th_name: "음명",
@@ -1224,6 +1362,24 @@ const i18n = {
     side_partykeys: "— PartyKeys 36",
     qs_callout_label: "이게 전부입니다.",
     qs_callout_body: " 중요한 건 세 가지: (1) SysEx 권한 요청, (2) \"LED 모드 진입\" 메시지 한 번 전송, (3) 색상을 바꾸고 싶을 때 <code>CMD 15</code> 키별 RGB 메시지 전송. 나머지는 편의 기능.",
+    proto_h_hl: "4. CMD 0x14 — Highlight / Darklight",
+    proto_p_hl: "디바이스에 미리 로드된 UI 팔레트(<code>paletteUI_k[]</code>)를 참조하는 상위 레벨 조명 명령. 가이드 연주(코드 트레이너, 시창, 시퀀서 재생) 시나리오를 위한 두 가지 상태 — <strong>Highlight</strong>는 연주자가 <em>지금</em> 눌러야 할 키, <strong>Darklight</strong>(예비 점등)는 다음에 누를 키의 어두운 미리보기. 와이어상에서 <code>Send_LightUp</code>은 CMD <code>0x71</code> 팔레트 할당으로 구현됩니다.",
+    th_state: "상태",
+    th_command: "명령",
+    th_slot: "팔레트 슬롯",
+    th_brightness: "밝기",
+    th_use: "사용 예",
+    td_hl_use: "연주자가 지금 눌러야 할 키",
+    td_dl_use: "다음에 누를 키, 어두운 미리보기",
+    proto_palette_h: "<strong>팔레트 레이아웃 (28 슬롯).</strong> UI 팔레트 구조:",
+    th_slots: "슬롯",
+    th_color_group: "색상 그룹",
+    td_palette_off: "검정 (꺼짐)",
+    td_palette_off2: "검정 (꺼짐)",
+    td_palette_hl: "Highlight 강조 색상 — 최대 밝기 × 1.0",
+    td_palette_dl: "Darklight 예비 점등 색상 — 어두움 × 0.75 (1–12와 같은 색조)",
+    td_palette_white: "흰색",
+    proto_wire_h: "<strong>와이어 형식.</strong> 두 상태 모두 와이어상에서 CMD <code>0x71</code> 팔레트 할당으로 전송됩니다. C3 옥타브 전체(키 48–59)를 Highlight 또는 Darklight로 점등:",
     footer_home: "partykeys.com",
   },
   es: {
@@ -1253,7 +1409,7 @@ const i18n = {
     proto_h3: "3. CMD 15 — RGB por tecla",
     proto_p3: "Establece cualquier número de teclas en cualquier color RGB de 24 bits en un solo mensaje. Agrupa las teclas que comparten color.",
     proto_p_color: "<strong>Codificación de color</strong> — MIDI es de 7 bits, así que cada canal 0–255 se divide en un par:",
-    proto_h4: "4. Apagar todo",
+    proto_h4: "5. Apagar todo",
     proto_layout_label: "Disposición de teclas:",
     proto_layout_body: "<code>midi_note = key_index + 48</code>. Índice 0 = más a la izquierda (C3), 35 = más a la derecha (B5).",
     proto_warn_label: "Eco de note-on.",
@@ -1295,7 +1451,7 @@ const i18n = {
     th_hex: "Bytes hex",
     td_off: "(apagado)",
     td_max: "(máx.)",
-    proto_layout_h: "5. Disposición de teclas",
+    proto_layout_h: "6. Disposición de teclas",
     th_index: "Índice",
     th_midi: "Nota MIDI",
     th_name: "Nombre de nota",
@@ -1314,6 +1470,24 @@ const i18n = {
     side_partykeys: "— PartyKeys 36",
     qs_callout_label: "Eso es todo.",
     qs_callout_body: " Tres cosas importan: (1) pedir acceso SysEx, (2) enviar el mensaje \"entrar en modo LED\" una vez, (3) enviar mensajes <code>CMD 15</code> RGB por tecla cuando quieras cambiar las luces. Todo lo demás es comodidad.",
+    proto_h_hl: "4. CMD 0x14 — Highlight / Darklight",
+    proto_p_hl: "Iluminación de más alto nivel que referencia una paleta UI precargada (<code>paletteUI_k[]</code>) en el dispositivo. Dos estados semánticos para juego guiado (entrenador de acordes, lectura a primera vista, reproducción de secuenciador) — <strong>Highlight</strong> para la tecla que el intérprete debe pulsar <em>ahora</em>, <strong>Darklight</strong> (pre-encendido) como vista previa atenuada de la siguiente tecla. En el cable, <code>Send_LightUp</code> se implementa como una asignación de paleta CMD <code>0x71</code>.",
+    th_state: "Estado",
+    th_command: "Comando",
+    th_slot: "Slot de paleta",
+    th_brightness: "Brillo",
+    th_use: "Uso típico",
+    td_hl_use: "La tecla que el intérprete debe pulsar ahora",
+    td_dl_use: "Siguiente tecla, atenuada como vista previa",
+    proto_palette_h: "<strong>Disposición de la paleta (28 slots).</strong> La paleta UI está estructurada así:",
+    th_slots: "Slots",
+    th_color_group: "Grupo de color",
+    td_palette_off: "Negro (apagado)",
+    td_palette_off2: "Negro (apagado)",
+    td_palette_hl: "Colores Highlight — brillo completo × 1.0",
+    td_palette_dl: "Colores Darklight — atenuados × 0.75 (mismos tonos que 1–12)",
+    td_palette_white: "Blanco",
+    proto_wire_h: "<strong>Formato en cable.</strong> Ambos estados se emiten como asignación de paleta CMD <code>0x71</code>. Para encender una octava C3 completa (teclas 48–59) en Highlight o Darklight:",
     footer_home: "partykeys.com",
   },
   fr: {
@@ -1343,7 +1517,7 @@ const i18n = {
     proto_h3: "3. CMD 15 — RGB par touche",
     proto_p3: "Définissez n'importe quel nombre de touches dans n'importe quelle couleur RGB 24 bits en un seul message. Regroupez les touches partageant une couleur.",
     proto_p_color: "<strong>Encodage couleur</strong> — MIDI est sur 7 bits, donc chaque canal 0–255 est divisé en deux octets :",
-    proto_h4: "4. Tout éteindre",
+    proto_h4: "5. Tout éteindre",
     proto_layout_label: "Disposition des touches :",
     proto_layout_body: "<code>midi_note = key_index + 48</code>. Index 0 = tout à gauche (C3), 35 = tout à droite (B5).",
     proto_warn_label: "Écho note-on.",
@@ -1385,7 +1559,7 @@ const i18n = {
     th_hex: "Octets hex",
     td_off: "(éteint)",
     td_max: "(max)",
-    proto_layout_h: "5. Disposition des touches",
+    proto_layout_h: "6. Disposition des touches",
     th_index: "Index",
     th_midi: "Note MIDI",
     th_name: "Nom de note",
@@ -1404,6 +1578,24 @@ const i18n = {
     side_partykeys: "— PartyKeys 36",
     qs_callout_label: "C'est tout.",
     qs_callout_body: " Trois choses comptent : (1) demander l'accès SysEx, (2) envoyer le message « entrer en mode LED » une fois, (3) envoyer des messages <code>CMD 15</code> RGB par touche quand les lumières doivent changer. Le reste, c'est du confort.",
+    proto_h_hl: "4. CMD 0x14 — Highlight / Darklight",
+    proto_p_hl: "Éclairage de plus haut niveau qui référence une palette UI préchargée (<code>paletteUI_k[]</code>) sur l'appareil. Deux états sémantiques pour les scénarios de jeu guidé (entraîneur d'accords, lecture à vue, lecture séquenceur) — <strong>Highlight</strong> pour la touche que le joueur doit appuyer <em>maintenant</em>, <strong>Darklight</strong> (pré-éclairage) comme aperçu atténué de la touche suivante. Sur le câble, <code>Send_LightUp</code> est implémenté comme une attribution de palette CMD <code>0x71</code>.",
+    th_state: "État",
+    th_command: "Commande",
+    th_slot: "Slot de palette",
+    th_brightness: "Luminosité",
+    th_use: "Utilisation typique",
+    td_hl_use: "La touche que le joueur doit appuyer maintenant",
+    td_dl_use: "Touche suivante, atténuée comme aperçu",
+    proto_palette_h: "<strong>Disposition de la palette (28 slots).</strong> La palette UI est structurée comme suit :",
+    th_slots: "Slots",
+    th_color_group: "Groupe de couleurs",
+    td_palette_off: "Noir (éteint)",
+    td_palette_off2: "Noir (éteint)",
+    td_palette_hl: "Couleurs Highlight — pleine luminosité × 1.0",
+    td_palette_dl: "Couleurs Darklight — atténuées × 0.75 (mêmes teintes que 1–12)",
+    td_palette_white: "Blanc",
+    proto_wire_h: "<strong>Format câble.</strong> Les deux états sont émis comme attribution de palette CMD <code>0x71</code>. Pour allumer une octave C3 entière (touches 48–59) en Highlight ou Darklight :",
     footer_home: "partykeys.com",
   },
   de: {
@@ -1433,7 +1625,7 @@ const i18n = {
     proto_h3: "3. CMD 15 — RGB pro Taste",
     proto_p3: "Setze beliebig viele Tasten in einer Nachricht auf eine beliebige 24-Bit-RGB-Farbe. Tasten mit gleicher Farbe gruppieren.",
     proto_p_color: "<strong>Farbcodierung</strong> — MIDI ist 7-Bit, daher wird jeder 0–255-Kanal in ein Paar aufgeteilt:",
-    proto_h4: "4. Alles aus",
+    proto_h4: "5. Alles aus",
     proto_layout_label: "Tastenbelegung:",
     proto_layout_body: "<code>midi_note = key_index + 48</code>. Index 0 = ganz links (C3), 35 = ganz rechts (B5).",
     proto_warn_label: "Note-on-Echo.",
@@ -1475,7 +1667,7 @@ const i18n = {
     th_hex: "Hex-Bytes",
     td_off: "(aus)",
     td_max: "(max.)",
-    proto_layout_h: "5. Tastenbelegung",
+    proto_layout_h: "6. Tastenbelegung",
     th_index: "Tastenindex",
     th_midi: "MIDI-Note",
     th_name: "Notenname",
@@ -1494,6 +1686,24 @@ const i18n = {
     side_partykeys: "— PartyKeys 36",
     qs_callout_label: "Das war's.",
     qs_callout_body: " Drei Dinge sind wichtig: (1) SysEx-Zugriff anfordern, (2) die \"LED-Modus aktivieren\"-Nachricht einmal senden, (3) <code>CMD 15</code>-RGB-Nachrichten pro Taste senden, wann immer die Lichter wechseln sollen. Alles andere ist Komfort.",
+    proto_h_hl: "4. CMD 0x14 — Highlight / Darklight",
+    proto_p_hl: "Höhere Ebene der Beleuchtung, die auf eine vorgeladene UI-Palette (<code>paletteUI_k[]</code>) im Gerät verweist. Zwei semantische Zustände für geführtes Spiel (Akkord-Trainer, Vom-Blatt-Spiel, Sequencer-Wiedergabe) — <strong>Highlight</strong> für die Taste, die der Spieler <em>jetzt</em> drücken soll, <strong>Darklight</strong> (Vorleuchten) als dunklere Vorschau der nächsten Taste. Auf der Leitung ist <code>Send_LightUp</code> als CMD <code>0x71</code> Paletten-Zuweisung implementiert.",
+    th_state: "Zustand",
+    th_command: "Befehl",
+    th_slot: "Paletten-Slot",
+    th_brightness: "Helligkeit",
+    th_use: "Typische Verwendung",
+    td_hl_use: "Die Taste, die der Spieler jetzt drücken soll",
+    td_dl_use: "Nächste Taste, gedimmt als Vorschau",
+    proto_palette_h: "<strong>Paletten-Layout (28 Slots).</strong> Die UI-Palette ist wie folgt strukturiert:",
+    th_slots: "Slots",
+    th_color_group: "Farbgruppe",
+    td_palette_off: "Schwarz (aus)",
+    td_palette_off2: "Schwarz (aus)",
+    td_palette_hl: "Highlight-Farben — volle Helligkeit × 1.0",
+    td_palette_dl: "Darklight-Farben — gedimmt × 0.75 (gleiche Farbtöne wie 1–12)",
+    td_palette_white: "Weiß",
+    proto_wire_h: "<strong>Wire-Format.</strong> Beide Zustände werden als CMD <code>0x71</code> Paletten-Zuweisung gesendet. Eine komplette C3-Oktave (Tasten 48–59) auf Highlight oder Darklight schalten:",
     footer_home: "partykeys.com",
   },
   pt: {
@@ -1523,7 +1733,7 @@ const i18n = {
     proto_h3: "3. CMD 15 — RGB por tecla",
     proto_p3: "Define qualquer número de teclas em qualquer cor RGB de 24 bits em uma única mensagem. Agrupe teclas com a mesma cor.",
     proto_p_color: "<strong>Codificação de cor</strong> — MIDI é 7-bit, então cada canal 0–255 é dividido em um par:",
-    proto_h4: "4. Apagar tudo",
+    proto_h4: "5. Apagar tudo",
     proto_layout_label: "Layout das teclas:",
     proto_layout_body: "<code>midi_note = key_index + 48</code>. Índice 0 = mais à esquerda (C3), 35 = mais à direita (B5).",
     proto_warn_label: "Eco de note-on.",
@@ -1565,7 +1775,7 @@ const i18n = {
     th_hex: "Bytes hex",
     td_off: "(apagado)",
     td_max: "(máx.)",
-    proto_layout_h: "5. Layout das teclas",
+    proto_layout_h: "6. Layout das teclas",
     th_index: "Índice",
     th_midi: "Nota MIDI",
     th_name: "Nome da nota",
@@ -1584,6 +1794,24 @@ const i18n = {
     side_partykeys: "— PartyKeys 36",
     qs_callout_label: "É só isso.",
     qs_callout_body: " Três coisas importam: (1) pedir acesso SysEx, (2) enviar a mensagem \"entrar no modo LED\" uma vez, (3) enviar mensagens <code>CMD 15</code> RGB por tecla sempre que quiser mudar as luzes. Tudo o mais é conveniência.",
+    proto_h_hl: "4. CMD 0x14 — Highlight / Darklight",
+    proto_p_hl: "Iluminação de nível superior que referencia uma paleta UI pré-carregada (<code>paletteUI_k[]</code>) no dispositivo. Dois estados semânticos para cenários de toque guiado (treinador de acordes, leitura à primeira vista, reprodução de sequenciador) — <strong>Highlight</strong> para a tecla que o tocador deve pressionar <em>agora</em>, <strong>Darklight</strong> (pré-acendimento) como prévia esmaecida da próxima tecla. No fio, <code>Send_LightUp</code> é implementado como uma atribuição de paleta CMD <code>0x71</code>.",
+    th_state: "Estado",
+    th_command: "Comando",
+    th_slot: "Slot de paleta",
+    th_brightness: "Brilho",
+    th_use: "Uso típico",
+    td_hl_use: "A tecla que o tocador deve pressionar agora",
+    td_dl_use: "Próxima tecla, esmaecida como prévia",
+    proto_palette_h: "<strong>Layout da paleta (28 slots).</strong> A paleta UI está estruturada assim:",
+    th_slots: "Slots",
+    th_color_group: "Grupo de cor",
+    td_palette_off: "Preto (apagado)",
+    td_palette_off2: "Preto (apagado)",
+    td_palette_hl: "Cores Highlight — brilho total × 1.0",
+    td_palette_dl: "Cores Darklight — esmaecidas × 0.75 (mesmos matizes de 1–12)",
+    td_palette_white: "Branco",
+    proto_wire_h: "<strong>Formato no fio.</strong> Ambos os estados são emitidos como atribuição de paleta CMD <code>0x71</code>. Para acender uma oitava C3 inteira (teclas 48–59) em Highlight ou Darklight:",
     footer_home: "partykeys.com",
   }
 };
