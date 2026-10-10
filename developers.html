@@ -182,6 +182,8 @@
   .callout.info strong { color: #1d4ed8; }
 
   /* Tables */
+  .table-scroll { max-width: 100%; overflow-x: auto; margin: 14px 0; }
+  .table-scroll .doc-table { margin: 0; }
   .doc-table {
     width: 100%; border-collapse: collapse; margin: 14px 0;
     font-size: 13.5px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
@@ -282,6 +284,14 @@
   .ai-prompt-header button.copied { background: white; color: var(--brand); }
 
   /* Footer */
+  .profile-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }
+  .profile-card { padding: 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-subtle); min-width: 0; overflow-wrap: anywhere; }
+  .profile-card h4 { margin-top: 0; }
+  .profile-card p { font-size: 14px; }
+  .module-links { overflow-wrap: anywhere; }
+  #verified-lighting code:not(pre code) { overflow-wrap: anywhere; }
+  @media (max-width: 1000px) { .profile-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 420px) { .brand-name { font-size: 13px; } .brand-name span { display: none; } .topbar-actions { gap: 6px; } .github-btn { padding: 7px 8px; } .tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   footer.site-footer {
     border-top: 1px solid var(--border);
     padding: 24px 28px; text-align: center;
@@ -333,6 +343,7 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-section">
+      <a href="#verified-lighting" class="sidebar-link" data-i18n="verified_title">Verified lighting rules</a>
       <a href="#quickstart" class="sidebar-link" data-i18n="side_quickstart">Quickstart</a>
       <a href="#protocol" class="sidebar-link" data-i18n="side_protocol">Protocol</a>
       <a href="#protocol-partykeys" class="sidebar-sublink" data-i18n="side_partykeys">— PartyKeys 36</a>
@@ -340,7 +351,7 @@
       <a href="#sdk" class="sidebar-link" data-i18n="side_sdk">SDK Examples</a>
       <a href="#ai" class="sidebar-link" data-i18n="side_ai">AI Assistant</a>
       <a href="#ai-prompt" class="sidebar-sublink" data-i18n="side_prompt">— LLM Prompt</a>
-      <a href="#claude-md" class="sidebar-sublink" data-i18n="side_claude_md">— CLAUDE.md</a>
+      <a href="#ai-conventions" class="sidebar-sublink" data-i18n="side_claude_md">— CLAUDE.md</a>
       <a href="#faq" class="sidebar-link" data-i18n="side_faq">FAQ</a>
     </div>
   </aside>
@@ -357,6 +368,7 @@
       </h1>
       <p class="lead" data-i18n="hero_lead">The open MIDI + SysEx spec for PartyKeys keyboards. Connect from a browser, a script, or hand it to your AI assistant.</p>
       <div class="hero-cta">
+        <a href="#verified-lighting" class="btn btn-primary" data-i18n="verified_title">Verified lighting rules</a>
         <a href="#quickstart" class="btn btn-primary"><span data-i18n="hero_cta_start">Start</span> →</a>
         <a href="https://github.com/allen4z/PartykeysProtocol" target="_blank" rel="noopener" class="btn btn-secondary">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
@@ -365,9 +377,95 @@
       </div>
     </section>
 
+
+    <!-- VERIFIED LIGHTING PROFILE: fruit-webmidi-palette71-v1 -->
+    <section class="doc-section" id="verified-lighting">
+      <div class="hero-eyebrow"><span data-i18n="verified_badge">User-confirmed · 2026-10-10</span></div>
+      <h2 data-i18n="verified_title">Verified lighting rules</h2>
+      <p data-i18n="verified_intro">Reuse the PartyKeys ChordCut lighting implementation: Web MIDI → PartyStudio / SAM5704 speaker relay → keyboard. Keep device profiles separate.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="downloads/partykeys-protocol.zip" download data-i18n="verified_download">Download Skill + code + tests</a>
+        <a class="btn btn-secondary" href="skills/partykeys-protocol/references/verified-web-midi.md" data-i18n="verified_guide">Full integration guide</a>
+        <a class="btn btn-secondary" href="skills/partykeys-protocol/SKILL.md">SKILL.md</a>
+      </div>
+      <div class="callout info" data-i18n="verified_evidence">Profile <code>fruit-webmidi-palette71-v1</code> · The user confirmed the ChordCut hardware chain. 25 offline regression tests pass. This is not a claim that every phone, firmware or spliced keyboard has been tested.</div>
+
+      <h3 data-i18n="verified_profiles">Choose the device profile first</h3>
+      <div class="profile-grid">
+        <div class="profile-card"><h4>PartyKeys / PartyStudio / SAM5704</h4><p data-i18n="verified_profile_relay">Verified Web MIDI profile. Palette <code>0x71</code>, actual MIDI notes <code>48–83</code>, mode <code>0F 05</code>. Use the reusable controller below.</p></div>
+        <div class="profile-card"><h4 data-i18n="verified_direct_title">Direct RGB</h4><p data-i18n="verified_profile_rgb">For an explicitly verified direct-device RGB profile: <code>0x15</code> + <code>0F 01</code>, key indices <code>0–35</code>. Do not apply its mode or large packets to the speaker relay.</p><a href="#protocol-partykeys" data-i18n="verified_direct_link">Direct-device reference →</a></div>
+        <div class="profile-card"><h4>PopuPiano 29</h4><p data-i18n="verified_profile_popu">Separate manufacturer <code>03</code>, commands <code>1E / 20 / 23</code>, lamp IDs <code>0–28</code>. Not covered by this relay hardware confirmation.</p><a href="#protocol-popupiano" data-i18n="verified_popu_link">PopuPiano reference →</a></div>
+      </div>
+
+      <h3 data-i18n="verified_sequence">Initialization and small-packet rules</h3>
+      <ol>
+        <li data-i18n="verified_step1">After output opens, enter palette mode using the <code>7F</code> device-type byte; key-color frames still use <code>05</code>.</li>
+        <li data-i18n="verified_step2">Clear after 8 ms, settle for 120 ms, then query and restore the current target. These are controller timings, not a measured physical LED latency.</li>
+        <li data-i18n="verified_step3">At most <strong>3 note/color pairs per frame</strong> (16-byte SysEx), paced by at least <strong>8 ms</strong>. MidiBrowser's 256-byte limit does not permit large relay packets.</li>
+        <li data-i18n="verified_step4">Send raw Web MIDI SysEx, without BLE timestamps. Recompute deltas after each successful write so a new chord or pause cancels stale pending notes.</li>
+      </ol>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SysEx · palette71 · hex</span><button class="copy-btn" data-copy-target="verified-frames"><span data-i18n="copy">Copy</span></button></div>
+<pre><code class="language-plaintext" id="verified-frames"># Mode → 8 ms → clear → 120 ms → query → paced target
+F0 7F 30 7F 7F 20 00 0F 05 F7
+F0 05 30 7F 7F 20 00 71 00 F7
+F0 05 30 7F 7F 20 00 01 F7
+
+# Optional C4 E4 G4 C5 diagnostic; two packets, at least 8 ms apart
+F0 05 30 7F 7F 20 00 71 03 3C 08 40 08 43 08 F7
+F0 05 30 7F 7F 20 00 71 01 48 08 F7</code></pre>
+      </div>
+
+      <h3 data-i18n="verified_routing_title">Routing, reconnect and input safety</h3>
+      <ul>
+        <li data-i18n="verified_route">Recognize and select the output; only accept topology reports from its unambiguously paired input. Learn channel/address from CMD <code>02</code>; use <code>7F/7F</code> broadcast on that bus until known, not a hard-coded <code>3F</code>.</li>
+        <li data-i18n="verified_events">CMD <code>04/05</code> triggers a debounced requery; CMD <code>18</code> updates octave routing. Do not reset the player's octave or treat a silent query as a disconnect.</li>
+        <li data-i18n="verified_lifecycle">Pause/stop: all off. Reconnect: initialize, clear, then restore the CURRENT target only. Dispose timers on exit; never close the host App's shared MIDI/BLE connection.</li>
+        <li data-i18n="verified_input">Never use Note On for lighting. Preserve the existing input parser, velocity, channels, running status and CC64. Screen, scoring and lights share actual MIDI notes; do not silently transpose out-of-range notes.</li>
+        <li data-i18n="verified_audio">Do not globally mute audio. If separately implementing speaker audio routing, mute only the web piano after reliable speaker-online confirmation; keep SFX and BGM. Keyboard CMD <code>05</code> is not speaker-online evidence.</li>
+      </ul>
+
+      <h3 data-i18n="verified_reuse">Reuse in another project</h3>
+      <p data-i18n="verified_reuse_body">The ZIP contains the complete Skill, three dependency-free ESM modules and tests. Keep the modules together; use your existing Web MIDI access and input callbacks. The App owns Bluetooth pairing.</p>
+      <p class="module-links"><a href="skills/partykeys-protocol/assets/web-midi/connect-lighting.mjs">connect-lighting.mjs</a> · <a href="skills/partykeys-protocol/assets/web-midi/partykeys-lights.mjs">partykeys-lights.mjs</a> · <a href="skills/partykeys-protocol/assets/web-midi/partykeys-routing.mjs">partykeys-routing.mjs</a></p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Codex Skill</span><button class="copy-btn" data-copy-target="verified-skill-prompt"><span data-i18n="copy">Copy</span></button></div>
+<pre><code class="language-plaintext" id="verified-skill-prompt">Use $partykeys-protocol to connect this project's key lighting
+using the user-confirmed PartyKeys ChordCut profile.
+Preserve existing MIDI input, audio and host-owned connections.</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">JavaScript · existing MIDI connection</span><button class="copy-btn" data-copy-target="verified-code"><span data-i18n="copy">Copy</span></button></div>
+<pre><code class="language-javascript" id="verified-code">import {
+  createPartyKeysLighting, lightingSysexAvailable
+} from './skills/partykeys-protocol/assets/web-midi/connect-lighting.mjs';
+
+// access: your existing MIDIAccess / injected Web MIDI connection.
+// sysexRequestSucceeded: true only if {sysex:true} actually succeeded.
+const lights = createPartyKeysLighting({
+  inputs: access.inputs,
+  outputs: access.outputs,
+  outputId: selectedOutputId, // omit only when there is one supported output
+  sysexEnabled: lightingSysexAvailable(access, sysexRequestSucceeded),
+  onStatus: (state, detail) =&gt; console.info(state, detail)
+});
+
+// Keep the original parser/scoring/audio path; forward bytes alongside it:
+// lights.receive(rawBytes, pairedInputId);
+lights.set(currentTargetMidiNotes); // same notes as the screen
+// Pause / stop: lights.off();
+// Exit / output change: lights.dispose();
+// Reconnect: recreate, then restore current target only if active.
+// "sent" means written to the MIDI API, not a physical LED acknowledgment.</code></pre>
+      </div>
+      <div class="callout warn" data-i18n="verified_capability">An injected bridge may omit <code>sysexEnabled</code>. The helper permits a successful <code>{sysex:true}</code> request unless explicitly denied. Ordinary-MIDI fallback alone never grants lighting. If unavailable, keep playing/scoring and show “Lighting unavailable”.</div>
+      <p data-i18n="verified_check">Run <code>node --test skills/partykeys-protocol/scripts/lighting.test.mjs skills/partykeys-protocol/scripts/routing.test.mjs</code>, then the target project's checks. Finally verify actual lamps, rapid chord changes and reconnect on the intended hardware.</p>
+    </section>
+
     <!-- QUICKSTART -->
     <section class="doc-section" id="quickstart">
       <h2 data-i18n="qs_title">Quickstart</h2>
+      <div class="callout warn" data-i18n="verified_legacy_scope">The following quickstart and SDK examples are for a verified direct RGB device only. For Web MIDI / speaker-relay integration, use the <a href="#verified-lighting">verified palette71 rules</a> above. Do not mix initialization modes.</div>
       <p data-i18n="qs_lead">Plug in a PartyKeys 36, open Chrome DevTools on any page, and paste:</p>
       <div class="code-block">
         <div class="code-header">
@@ -401,6 +499,7 @@ out.send([
     <section class="doc-section" id="protocol">
       <h2 data-i18n="proto_title">Protocol</h2>
       <p data-i18n="proto_lead"><strong>PartyKeys 36</strong> — 36 keys, MIDI 48–83, USB. Three commands are all you need.</p>
+      <div class="callout info" data-i18n="verified_legacy_scope">The following quickstart and SDK examples are for a verified direct RGB device only. For Web MIDI / speaker-relay integration, use the <a href="#verified-lighting">verified palette71 rules</a> above. Do not mix initialization modes.</div>
 
       <h3 id="protocol-partykeys" style="margin-top:24px;font-size:20px">PartyKeys 36</h3>
       <h4 data-i18n="proto_h1">1. Connect</h4>
@@ -436,7 +535,7 @@ F7
 #   R_hi R_lo  G_hi G_lo  B_hi B_lo  keyCount  key0 key1 ...</code></pre>
       </div>
 
-      <table class="doc-table">
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Protocol table"><table class="doc-table">
         <thead><tr>
           <th data-i18n="th_field">Field</th>
           <th data-i18n="th_bytes">Bytes</th>
@@ -450,7 +549,7 @@ F7
           <tr><td><code>keyCount</code></td><td>1</td><td>1–36</td><td data-i18n="td_count">Number of key indices that follow</td></tr>
           <tr><td><code>key0 … keyN</code></td><td>N</td><td>0–35</td><td data-i18n="td_indices">Key indices (0 = leftmost C3, 35 = rightmost B5)</td></tr>
         </tbody>
-      </table>
+      </table></div>
 
       <p style="margin-top:18px" data-i18n="proto_p_color"><strong>Color encoding</strong> — MIDI is 7-bit, so each 0–255 channel splits into a pair:</p>
       <div class="code-block">
@@ -462,7 +561,7 @@ const enc = v =&gt; [Math.floor(v / 128), v % 128];
 // firmware reconstructs: value = high × 128 + low</code></pre>
       </div>
 
-      <table class="doc-table">
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Protocol table"><table class="doc-table">
         <thead><tr>
           <th data-i18n="th_value">Color value</th>
           <th>high</th>
@@ -475,11 +574,11 @@ const enc = v =&gt; [Math.floor(v / 128), v % 128];
           <tr><td><code>128</code></td><td><code>0x01</code></td><td><code>0x00</code></td><td><code>01 00</code></td></tr>
           <tr><td><code>255</code> <span data-i18n="td_max">(max)</span></td><td><code>0x01</code></td><td><code>0x7F</code></td><td><code>01 7F</code></td></tr>
         </tbody>
-      </table>
+      </table></div>
 
       <h4 data-i18n="proto_h_hl">4. CMD 0x14 — Highlight / Darklight</h4>
       <p data-i18n="proto_p_hl">Higher-level lighting that references a pre-loaded UI palette (<code>paletteUI_k[]</code>) on the device. Two semantic states for guided-play scenarios (chord trainers, sight-reading, sequencer playback) — <strong>Highlight</strong> for the key the player should press <em>now</em>, <strong>Darklight</strong> as a dimmer preview of the upcoming key.</p>
-      <table class="doc-table">
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Protocol table"><table class="doc-table">
         <thead><tr>
           <th data-i18n="th_state">State</th>
           <th data-i18n="th_command">Command</th>
@@ -491,10 +590,10 @@ const enc = v =&gt; [Math.floor(v / 128), v % 128];
           <tr><td><strong>Highlight</strong> <span style="color:var(--text-soft)">(高亮)</span></td><td><code>Send_LightUp (0x14)</code></td><td><code>paletteUI_k[n]</code></td><td>× 1.0</td><td data-i18n="td_hl_use">The key the player should press now</td></tr>
           <tr><td><strong>Darklight</strong> <span style="color:var(--text-soft)">(预亮)</span></td><td><code>Send_LightUp (0x14)</code></td><td><code>paletteUI_k[n+14]</code></td><td>× 0.75</td><td data-i18n="td_dl_use">Next upcoming key, dimmed as a preview</td></tr>
         </tbody>
-      </table>
+      </table></div>
 
       <p style="margin-top:20px" data-i18n="proto_palette_h"><strong>Palette layout (28 slots).</strong> The UI palette is structured as:</p>
-      <table class="doc-table">
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Protocol table"><table class="doc-table">
         <thead><tr>
           <th data-i18n="th_slots">Slots</th>
           <th data-i18n="th_color_group">Color group</th>
@@ -506,9 +605,10 @@ const enc = v =&gt; [Math.floor(v / 128), v % 128];
           <tr><td><code>14 – 25</code></td><td data-i18n="td_palette_dl">Darklight colors — dim × 0.75 (same hues as 1–12)</td></tr>
           <tr><td><code>26, 27</code></td><td data-i18n="td_palette_white">White</td></tr>
         </tbody>
-      </table>
+      </table></div>
 
       <p style="margin-top:20px" data-i18n="proto_wire_h"><strong>Wire format.</strong> Both states are emitted as CMD <code>0x71</code> palette assignment. To light an entire C3 octave (keys 48–59) at Highlight or Darklight:</p>
+      <div class="callout warn" data-i18n="verified_palette_scope">Historical direct-device example only: <code>3F</code> is an address, not a universal destination; the 12-pair packet and dim/white palette slots require target-firmware verification. Do not copy it into the speaker relay. Use discovered routes and 3-pair packets there.</div>
       <div class="code-block">
         <div class="code-header"><span class="code-lang">SysEx · CMD 0x71 — one-octave Highlight + Darklight</span>
           <button class="copy-btn" data-copy-target="p-hldl"><span data-i18n="copy">Copy</span></button>
@@ -535,7 +635,7 @@ F7</code></pre>
       </div>
 
       <h4 id="key-layout" style="margin-top:30px" data-i18n="proto_layout_h">6. Key layout</h4>
-      <table class="doc-table">
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Protocol table"><table class="doc-table">
         <thead><tr>
           <th data-i18n="th_index">Key index</th>
           <th data-i18n="th_midi">MIDI note</th>
@@ -547,7 +647,7 @@ F7</code></pre>
           <tr><td><code>17</code></td><td><code>65</code></td><td>F4</td><td data-i18n="td_middle">Middle</td></tr>
           <tr><td><code>35</code></td><td><code>83</code></td><td>B5</td><td data-i18n="td_rightmost">Rightmost</td></tr>
         </tbody>
-      </table>
+      </table></div>
       <p style="font-size:13.5px;margin-top:6px"><span data-i18n="proto_layout_formula">General formula:</span> <code>midi_note = key_index + 48</code>. <span data-i18n="proto_layout_keys">36 keys total, 3 octaves C3–B5.</span></p>
 
       <div class="callout warn">
@@ -556,8 +656,8 @@ F7</code></pre>
       </div>
 
       <div class="callout info">
-        <strong data-i18n="proto_lat_label">LED latency ≈ 200 ms.</strong>
-        <span data-i18n="proto_lat_body"> Don't pre-fire the SysEx. Send it at the beat and delay your audio + visuals by the same constant.</span>
+        <strong data-i18n="verified_latency_title">Measure physical latency.</strong>
+        <span data-i18n="verified_latency"> The older direct-device estimate was 150–250 ms. It is not a measurement of the speaker relay. Do not force a 200 ms audio delay or confuse the controller's 120 ms initialization settle with LED latency.</span>
       </div>
 
       <!-- PopuPiano expanded -->
@@ -595,6 +695,7 @@ F0 03 1E 03 01  7F 00 00  00 7F 00  00 00 7F  F7</code></pre>
     <section class="doc-section" id="sdk">
       <h2 data-i18n="sdk_title">SDK Examples</h2>
       <p data-i18n="sdk_lead">Same task in four languages: connect, init, light keys 17–19 red/green/blue.</p>
+      <div class="callout warn" data-i18n="verified_legacy_scope">The following quickstart and SDK examples are for a verified direct RGB device only. For Web MIDI / speaker-relay integration, use the <a href="#verified-lighting">verified palette71 rules</a> above. Do not mix initialization modes.</div>
 
       <div class="tabs" role="tablist">
         <button class="tab-btn active" data-tab="js">JavaScript</button>
@@ -765,93 +866,82 @@ setLEDs([
           <button id="copy-llm-prompt" data-copy-target="llm-prompt"><span data-i18n="copy">Copy</span></button>
         </div>
         <div class="ai-prompt-body">
-<pre id="llm-prompt">You are a PartyKeys Protocol expert. PartyKeys is an open-source MIDI keyboard
-with addressable RGB LEDs per key. Two devices exist:
+<pre id="llm-prompt">You are implementing PartyKeys / 音乐密码 lighting. Select an explicit device
+profile before constructing any packets. Do not guess unknown MIDI outputs.
 
-═══ DEVICE A — PartyKeys 36 ═══
-• 36 keys, MIDI 48–83 (C3–B5), key_index = midi_note − 48
-• USB MIDI, requires SysEx: requestMIDIAccess({sysex:true})
-• Manufacturer header: 05 30 7F 7F 20 00
-• Detect by port name containing /partykey/i
+VERIFIED WEB MIDI PROFILE — fruit-webmidi-palette71-v1 (2026-10-10)
+User-confirmed in PartyKeys ChordCut: phone USB to the PartyStudio APP port,
+then wireless to keyboard. Recognized relay aliases: PartyStudio, SAM5704.
+Ordinary MIDI input is allowed for playing/scoring; proprietary output is not.
 
-PROTOCOL:
-1. Enter LED mode (REQUIRED ONCE after connect):
-   F0 05 30 7F 7F 20 00 0F 01 F7
+Reuse the complete Skill and dependency-free modules:
+https://protocol.partykeys.ai/downloads/partykeys-protocol.zip
+https://protocol.partykeys.ai/skills/partykeys-protocol/SKILL.md
+https://protocol.partykeys.ai/skills/partykeys-protocol/references/verified-web-midi.md
 
-2. CMD 0x15 — per-key RGB (the workhorse):
-   F0 05 30 7F 7F 20 00 15 &lt;numGroups&gt;
-     &lt;group&gt; × N
-   F7
+Wire sequence (hex):
+1. Open selected output, mode: F0 7F 30 7F 7F 20 00 0F 05 F7
+2. After 8 ms, all off: F0 05 30 7F 7F 20 00 71 00 F7
+3. Settle 120 ms, query: F0 05 30 7F 7F 20 00 01 F7
+4. Palette target:
+   F0 05 30 &lt;channel&gt; &lt;address&gt; 20 00 71 &lt;count&gt; &lt;note color pairs&gt; F7
+   Actual MIDI notes 48–83, color 08 (cyan), 00 off.
+   Maximum THREE pairs / 16 bytes; pace packets by at least 8 ms.
+   Raw Web MIDI SysEx only. Do not append BLE timestamps.
+   Mode device-type byte is 7F; key-color device-type byte stays 05.
 
-   Each group: R_hi R_lo  G_hi G_lo  B_hi B_lo  keyCount  key0 key1 ...
+Routing:
+- Select a recognized connected output and unambiguously pair its input.
+- Learn channel/address from CMD 02 reports; assign unassigned main-keyboard
+  channels only as the bundled controller does, then wait for its response.
+- Broadcast 7F/7F on the selected bus until the route is known.
+  Do not hard-code 3F for every device.
+- CMD 04/05: debounced topology query; CMD 18: octave update.
+  Do not send idle mode during play, or CMD 19 to reset the player's octave.
+- Query silence is not proof of disconnect.
 
-   Color encoding (MIDI is 7-bit, channel is 0–255):
-     high = floor(v / 128)    low = v % 128
-     255 = [0x01, 0x7F]   128 = [0x01, 0x00]   0 = [0x00, 0x00]
+Lifecycle and transport:
+- Keep existing Web MIDI / native-injected access. App owns USB/BLE pairing.
+- A successful {sysex:true} request is required. If an injected access object
+  omits sysexEnabled, accept only that successful request without explicit
+  denial. Normal MIDI fallback does not grant lighting permission.
+- Frame data must be 7-bit; reject out-of-range notes rather than transposing.
+- Delta updates use actually written notes. Recompute each small packet;
+  rapid changes and pause cancel stale unsent targets.
+- Pause/stop: clear. Reconnect: init, clear, restore CURRENT active target.
+  Exit: dispose timers and clear best effort, without closing shared ports.
+- "sent" means MIDI API writes completed, NOT a physical LED acknowledgment.
+- Preserve velocity, channels, multi-message packets, running status and CC64.
+  Screen and lighting use the same actual MIDI target notes.
+- Never use Note On for lighting: echo can create false player input.
+- No global mute. If audio routing is separately requested, confirmed external
+  speaker presence may mute web PIANO ONLY, never SFX/BGM. CMD 05 is not proof.
+- MidiBrowser's 256-byte ceiling does not supersede the relay's 16-byte limit.
+  Future MIDI timestamps may be ignored. 120 ms settle is NOT LED latency;
+  do not blindly delay all audio by the old 200 ms direct-device estimate.
 
-3. Send_LightUp (0x14) — Highlight / Darklight (palette mode):
-   • Higher-level than CMD 15 — references the device's UI palette (paletteUI_k[]).
-   • Two semantic states (high-level API):
-       Highlight (高亮): paletteUI_k[n]      × brightness 1.0  → key to press NOW
-       Darklight (预亮): paletteUI_k[n+14]  × brightness 0.75 → upcoming key (dimmer preview)
-   • Palette layout (28 slots):
-       0      → black (off)
-       1–12   → highlight colors (full brightness)
-       13     → black (off)
-       14–25  → darklight colors (dim 0.75, same hues as 1–12)
-       26, 27 → white
-   • On the wire: CMD 0x71 palette assignment. Example — Highlight one C3 octave
-     (keys 48–59, palette slots 1–12):
-       F0 05 30 7F 3F 20 00 71 0C
-         30 01  31 02  32 03  33 04  34 05  35 06
-         36 07  37 08  38 09  39 0A  3A 0B  3B 0C
-       F7
-     Same keys at Darklight (slots 14–25):
-       F0 05 30 7F 3F 20 00 71 0C
-         30 0E  31 0F  32 10  33 11  34 12  35 13
-         36 14  37 15  38 16  39 17  3A 18  3B 19
-       F7
-   • Use for chord trainers, sight-reading, sequencer playback — anywhere you want a
-     "now" vs "next" two-state visual cue.
+SEPARATE DIRECT RGB PROFILE (not a speaker-relay fallback)
+Only for explicitly verified direct RGB devices:
+mode F0 05 30 7F 7F 20 00 0F 01 F7; command 15; key indices 0–35.
+Each RGB group: R_hi R_lo G_hi G_lo B_hi B_lo count key...
+8-bit color v -&gt; floor(v/128), v%128. Data bytes &lt;=127; frame &lt;=256.
+Historical 12-pair / fixed-3F / dim-palette examples require firmware checks;
+do not transplant them into the verified relay.
 
-4. All off:
-   F0 05 30 7F 7F 20 00 71 00 F7
+SEPARATE POPUPIANO 29 PROFILE
+Manufacturer 03; MIDI notes 48–76; lamp IDs 0–28.
+CMD 1E uploads 7-bit RGB palette; CMD 20 assigns lamp/slot pairs.
+No PartyKeys mode packet. Not covered by the relay hardware confirmation.
 
-5. CMD 15 does NOT echo. Legacy note-on LEDs (0x90 note 0x40) DO echo
-   back to your input handler — always prefer CMD 15.
-
-6. Hardware LED latency ~200 ms. To sync with audio: fire SysEx at the
-   beat, delay audio + visuals by ~200 ms.
-
-═══ DEVICE B — PopuPiano 29 ═══
-• 29 keys, MIDI 48–76 (C3–E5), USB or BLE MIDI
-• Manufacturer header: 03 — detect by port name /popupiano/i
-• No "enter mode" message needed.
-
-PROTOCOL:
-1. CMD 0x1E — upload palette (7-bit RGB; scale 8→7 as v/2):
-   F0 03 1E &lt;numColors&gt; 01  &lt;R G B&gt; × N  F7
-   (Slot 0 reserved as "off"; custom colors live in slots 1–127.)
-
-2. CMD 0x20 — assign palette slots to keys:
-   F0 03 20 &lt;numPairs&gt;  &lt;lampID paletteSlot&gt; × N  F7
-   (lampID 0–28, slot 0 = off; palette persists until power-cycle.)
-
-RULES:
-✅ Always {sysex:true} for PartyKeys 36
-✅ Always send "enter LED mode" before any color on PartyKeys 36
-✅ Use delta updates — only send keys that changed
-❌ Don't send 8-bit color on the wire — must be 7-bit encoded
-
-Write working integration code in the user's language (JS/Web MIDI,
-Python/mido, Node/JZZ, Swift/CoreMIDI).
-
-Spec: https://github.com/allen4z/PartykeysProtocol
-Docs: https://www.partykeys.com/developers</pre>
+Validate with the bundled 25 offline tests plus target-project checks.
+Real-hardware coverage is limited to the user-confirmed chain; do not claim
+every phone, firmware or multi-keyboard setup has passed.
+Integration does not authorize unrelated deployment or account changes.
+Docs: https://protocol.partykeys.ai/#verified-lighting</pre>
         </div>
       </div>
 
-      <h3 id="claude-md" style="margin-top:32px" data-i18n="ai_cmd_h">CLAUDE.md / .cursorrules template</h3>
+      <h3 id="ai-conventions" style="margin-top:32px" data-i18n="ai_cmd_h">CLAUDE.md / .cursorrules template</h3>
       <p data-i18n="ai_cmd_p">Drop into your repo root. Claude Code, Cursor, and Copilot read it automatically.</p>
 
       <div class="code-block">
@@ -861,53 +951,83 @@ Docs: https://www.partykeys.com/developers</pre>
         </div>
 <pre><code class="language-markdown" id="claude-md"># PartyKeys Project Conventions
 
-This project integrates with **PartyKeys Protocol** — open MIDI + SysEx
-spec for the PartyKeys 36 (C3–B5, MIDI 48–83) keyboard.
+Apply the explicit device profiles and safety rules below. The reusable
+Codex skill is $partykeys-protocol. Keep its three ESM files together and
+integrate with the existing input/connection lifecycle; do not replace audio
+or scoring just to add lighting.
 
-## Protocol cheat sheet
+You are implementing PartyKeys / 音乐密码 lighting. Select an explicit device
+profile before constructing any packets. Do not guess unknown MIDI outputs.
 
-Always request SysEx:
-```js
-const access = await navigator.requestMIDIAccess({ sysex: true });
-```
+VERIFIED WEB MIDI PROFILE — fruit-webmidi-palette71-v1 (2026-10-10)
+User-confirmed in PartyKeys ChordCut: phone USB to the PartyStudio APP port,
+then wireless to keyboard. Recognized relay aliases: PartyStudio, SAM5704.
+Ordinary MIDI input is allowed for playing/scoring; proprietary output is not.
 
-Always send "enter LED mode" once after (re)connect:
-```
-F0 05 30 7F 7F 20 00 0F 01 F7
-```
+Reuse the complete Skill and dependency-free modules:
+https://protocol.partykeys.ai/downloads/partykeys-protocol.zip
+https://protocol.partykeys.ai/skills/partykeys-protocol/SKILL.md
+https://protocol.partykeys.ai/skills/partykeys-protocol/references/verified-web-midi.md
 
-Per-key RGB is the primary command (CMD 0x15). Each 8-bit color channel
-splits 7-bit: `high = floor(v/128); low = v % 128`.
+Wire sequence (hex):
+1. Open selected output, mode: F0 7F 30 7F 7F 20 00 0F 05 F7
+2. After 8 ms, all off: F0 05 30 7F 7F 20 00 71 00 F7
+3. Settle 120 ms, query: F0 05 30 7F 7F 20 00 01 F7
+4. Palette target:
+   F0 05 30 &lt;channel&gt; &lt;address&gt; 20 00 71 &lt;count&gt; &lt;note color pairs&gt; F7
+   Actual MIDI notes 48–83, color 08 (cyan), 00 off.
+   Maximum THREE pairs / 16 bytes; pace packets by at least 8 ms.
+   Raw Web MIDI SysEx only. Do not append BLE timestamps.
+   Mode device-type byte is 7F; key-color device-type byte stays 05.
 
-Frame:
-```
-F0 05 30 7F 7F 20 00 15 &lt;numGroups&gt;
-  &lt;R_hi R_lo G_hi G_lo B_hi B_lo keyCount key0 key1 ...&gt; × N
-F7
-```
+Routing:
+- Select a recognized connected output and unambiguously pair its input.
+- Learn channel/address from CMD 02 reports; assign unassigned main-keyboard
+  channels only as the bundled controller does, then wait for its response.
+- Broadcast 7F/7F on the selected bus until the route is known.
+  Do not hard-code 3F for every device.
+- CMD 04/05: debounced topology query; CMD 18: octave update.
+  Do not send idle mode during play, or CMD 19 to reset the player's octave.
+- Query silence is not proof of disconnect.
 
-Send_LightUp (0x14) — Highlight / Darklight (palette mode, optional):
-- Two semantic states share `Send_LightUp`; both index the device's UI palette `paletteUI_k[]`:
-  - Highlight (高亮): `paletteUI_k[n]`     × brightness 1.0  — key to press now
-  - Darklight (预亮): `paletteUI_k[n+14]` × brightness 0.75 — upcoming key (preview)
-- Palette (28 slots): 0 & 13 = black, 1–12 = highlight (full brightness),
-  14–25 = darklight (dim 0.75, same hues as 1–12), 26 & 27 = white.
-- On the wire: CMD `0x71` palette assignment. Example — Highlight C3 octave:
-  `F0 05 30 7F 3F 20 00 71 0C 30 01 31 02 32 03 33 04 34 05 35 06 36 07 37 08 38 09 39 0A 3A 0B 3B 0C F7`
-- Use for chord trainers, sight-reading, sequencer playback.
+Lifecycle and transport:
+- Keep existing Web MIDI / native-injected access. App owns USB/BLE pairing.
+- A successful {sysex:true} request is required. If an injected access object
+  omits sysexEnabled, accept only that successful request without explicit
+  denial. Normal MIDI fallback does not grant lighting permission.
+- Frame data must be 7-bit; reject out-of-range notes rather than transposing.
+- Delta updates use actually written notes. Recompute each small packet;
+  rapid changes and pause cancel stale unsent targets.
+- Pause/stop: clear. Reconnect: init, clear, restore CURRENT active target.
+  Exit: dispose timers and clear best effort, without closing shared ports.
+- "sent" means MIDI API writes completed, NOT a physical LED acknowledgment.
+- Preserve velocity, channels, multi-message packets, running status and CC64.
+  Screen and lighting use the same actual MIDI target notes.
+- Never use Note On for lighting: echo can create false player input.
+- No global mute. If audio routing is separately requested, confirmed external
+  speaker presence may mute web PIANO ONLY, never SFX/BGM. CMD 05 is not proof.
+- MidiBrowser's 256-byte ceiling does not supersede the relay's 16-byte limit.
+  Future MIDI timestamps may be ignored. 120 ms settle is NOT LED latency;
+  do not blindly delay all audio by the old 200 ms direct-device estimate.
 
-All off: `F0 05 30 7F 7F 20 00 71 00 F7`
+SEPARATE DIRECT RGB PROFILE (not a speaker-relay fallback)
+Only for explicitly verified direct RGB devices:
+mode F0 05 30 7F 7F 20 00 0F 01 F7; command 15; key indices 0–35.
+Each RGB group: R_hi R_lo G_hi G_lo B_hi B_lo count key...
+8-bit color v -&gt; floor(v/128), v%128. Data bytes &lt;=127; frame &lt;=256.
+Historical 12-pair / fixed-3F / dim-palette examples require firmware checks;
+do not transplant them into the verified relay.
 
-## Conventions
+SEPARATE POPUPIANO 29 PROFILE
+Manufacturer 03; MIDI notes 48–76; lamp IDs 0–28.
+CMD 1E uploads 7-bit RGB palette; CMD 20 assigns lamp/slot pairs.
+No PartyKeys mode packet. Not covered by the relay hardware confirmation.
 
-- Use the helper `setLEDs(groups)` — never craft raw SysEx at call sites.
-- Use delta updates: only send keys whose color is changing.
-- Prefer CMD 15 over legacy note-on LEDs (those echo back as fake input).
-- Hardware LED latency ≈ 200 ms; if syncing to audio, delay audio + visuals
-  by `HW_LATENCY_MS` instead of pre-firing SysEx.
-- Always `allOff()` on app teardown.
-
-Spec: https://github.com/allen4z/PartykeysProtocol
+Validate with the bundled 25 offline tests plus target-project checks.
+Real-hardware coverage is limited to the user-confirmed chain; do not claim
+every phone, firmware or multi-keyboard setup has passed.
+Integration does not authorize unrelated deployment or account changes.
+Docs: https://protocol.partykeys.ai/#verified-lighting
 </code></pre>
       </div>
     </section>
@@ -918,12 +1038,12 @@ Spec: https://github.com/allen4z/PartykeysProtocol
 
       <details class="faq">
         <summary data-i18n="faq_1_q">My color commands do nothing.</summary>
-        <div class="faq-body" data-i18n="faq_1_a">Three checks: (1) <code>{sysex: true}</code> in <code>requestMIDIAccess</code>, (2) sent "enter LED mode" after connect, (3) you encoded each 8-bit channel as two 7-bit bytes. That's 99% of cases.</div>
+        <div class="faq-body" data-i18n="verified_faq1">Check SysEx capability, selected matching output, profile-specific initialization, relay packet size/pacing and discovered route. Receiving notes does not prove lighting output works. <a href="#verified-lighting">See the verified rules.</a></div>
       </details>
 
       <details class="faq">
         <summary data-i18n="faq_2_q">LEDs trail my audio.</summary>
-        <div class="faq-body" data-i18n="faq_2_a">Hardware delay is ~150–250 ms. Don't pre-fire SysEx — send at the beat, then delay your audio + visuals by ~200 ms (one constant).</div>
+        <div class="faq-body" data-i18n="verified_latency">The older direct-device estimate was 150–250 ms. It is not a measurement of the speaker relay. Do not force a 200 ms audio delay or confuse the controller's 120 ms initialization settle with LED latency.</div>
       </details>
 
       <details class="faq">
@@ -1816,6 +1936,78 @@ const i18n = {
   }
 };
 
+// Verified relay rules: untranslated languages explicitly fall back to English.
+Object.assign(i18n.en, {
+  "verified_badge": "User-confirmed · 2026-10-10",
+  "verified_title": "Verified lighting rules",
+  "verified_intro": "Reuse the PartyKeys ChordCut lighting implementation: Web MIDI → PartyStudio / SAM5704 speaker relay → keyboard. Keep device profiles separate.",
+  "verified_download": "Download Skill + code + tests",
+  "verified_guide": "Full integration guide",
+  "verified_evidence": "Profile <code>fruit-webmidi-palette71-v1</code> · The user confirmed the ChordCut hardware chain. 25 offline regression tests pass. This is not a claim that every phone, firmware or spliced keyboard has been tested.",
+  "verified_profiles": "Choose the device profile first",
+  "verified_profile_relay": "Verified Web MIDI profile. Palette <code>0x71</code>, actual MIDI notes <code>48–83</code>, mode <code>0F 05</code>. Use the reusable controller below.",
+  "verified_direct_title": "Direct RGB",
+  "verified_profile_rgb": "For an explicitly verified direct-device RGB profile: <code>0x15</code> + <code>0F 01</code>, key indices <code>0–35</code>. Do not apply its mode or large packets to the speaker relay.",
+  "verified_direct_link": "Direct-device reference →",
+  "verified_profile_popu": "Separate manufacturer <code>03</code>, commands <code>1E / 20 / 23</code>, lamp IDs <code>0–28</code>. Not covered by this relay hardware confirmation.",
+  "verified_popu_link": "PopuPiano reference →",
+  "verified_sequence": "Initialization and small-packet rules",
+  "verified_step1": "After output opens, enter palette mode using the <code>7F</code> device-type byte; key-color frames still use <code>05</code>.",
+  "verified_step2": "Clear after 8 ms, settle for 120 ms, then query and restore the current target. These are controller timings, not a measured physical LED latency.",
+  "verified_step3": "At most <strong>3 note/color pairs per frame</strong> (16-byte SysEx), paced by at least <strong>8 ms</strong>. MidiBrowser's 256-byte limit does not permit large relay packets.",
+  "verified_step4": "Send raw Web MIDI SysEx, without BLE timestamps. Recompute deltas after each successful write so a new chord or pause cancels stale pending notes.",
+  "verified_routing_title": "Routing, reconnect and input safety",
+  "verified_route": "Recognize and select the output; only accept topology reports from its unambiguously paired input. Learn channel/address from CMD <code>02</code>; use <code>7F/7F</code> broadcast on that bus until known, not a hard-coded <code>3F</code>.",
+  "verified_events": "CMD <code>04/05</code> triggers a debounced requery; CMD <code>18</code> updates octave routing. Do not reset the player's octave or treat a silent query as a disconnect.",
+  "verified_lifecycle": "Pause/stop: all off. Reconnect: initialize, clear, then restore the CURRENT target only. Dispose timers on exit; never close the host App's shared MIDI/BLE connection.",
+  "verified_input": "Never use Note On for lighting. Preserve the existing input parser, velocity, channels, running status and CC64. Screen, scoring and lights share actual MIDI notes; do not silently transpose out-of-range notes.",
+  "verified_audio": "Do not globally mute audio. If separately implementing speaker audio routing, mute only the web piano after reliable speaker-online confirmation; keep SFX and BGM. Keyboard CMD <code>05</code> is not speaker-online evidence.",
+  "verified_reuse": "Reuse in another project",
+  "verified_reuse_body": "The ZIP contains the complete Skill, three dependency-free ESM modules and tests. Keep the modules together; use your existing Web MIDI access and input callbacks. The App owns Bluetooth pairing.",
+  "verified_capability": "An injected bridge may omit <code>sysexEnabled</code>. The helper permits a successful <code>{sysex:true}</code> request unless explicitly denied. Ordinary-MIDI fallback alone never grants lighting. If unavailable, keep playing/scoring and show “Lighting unavailable”.",
+  "verified_check": "Run <code>node --test skills/partykeys-protocol/scripts/lighting.test.mjs skills/partykeys-protocol/scripts/routing.test.mjs</code>, then the target project's checks. Finally verify actual lamps, rapid chord changes and reconnect on the intended hardware.",
+  "verified_legacy_scope": "The following quickstart and SDK examples are for a verified direct RGB device only. For Web MIDI / speaker-relay integration, use the <a href=\"#verified-lighting\">verified palette71 rules</a> above. Do not mix initialization modes.",
+  "verified_palette_scope": "Historical direct-device example only: <code>3F</code> is an address, not a universal destination; the 12-pair packet and dim/white palette slots require target-firmware verification. Do not copy it into the speaker relay. Use discovered routes and 3-pair packets there.",
+  "verified_latency_title": "Measure physical latency.",
+  "verified_latency": "The older direct-device estimate was 150–250 ms. It is not a measurement of the speaker relay. Do not force a 200 ms audio delay or confuse the controller's 120 ms initialization settle with LED latency.",
+  "verified_faq1": "Check SysEx capability, selected matching output, profile-specific initialization, relay packet size/pacing and discovered route. Receiving notes does not prove lighting output works. <a href=\"#verified-lighting\">See the verified rules.</a>"
+});
+Object.assign(i18n.zh, {
+  "verified_badge": "用户实测确认 · 2026-10-10",
+  "verified_title": "已验证亮灯规则",
+  "verified_intro": "复用和弦切切乐已确认通过的亮灯实现：Web MIDI → PartyStudio / SAM5704 大音箱中转 → 键盘。不同设备使用不同配置，不混发协议。",
+  "verified_download": "下载 Skill、代码与测试",
+  "verified_guide": "完整接入说明",
+  "verified_evidence": "配置 <code>fruit-webmidi-palette71-v1</code> · 用户已确认切切乐的实际硬件链路，25 项离线回归测试通过。不代表所有手机、固件或拼接键盘均已实测。",
+  "verified_profiles": "先选设备配置，再接亮灯",
+  "verified_profile_relay": "已验证的 Web MIDI 配置。调色板命令 <code>0x71</code>，实际 MIDI 音符 <code>48–83</code>，模式 <code>0F 05</code>。直接复用下方控制器。",
+  "verified_direct_title": "直连 RGB",
+  "verified_profile_rgb": "仅用于已明确验证的直连 RGB 设备：<code>0x15</code> + <code>0F 01</code>，琴键索引 <code>0–35</code>。不能把它的初始化和大包照搬到音箱中转。",
+  "verified_direct_link": "查看直连协议 →",
+  "verified_profile_popu": "独立厂商头 <code>03</code>，命令 <code>1E / 20 / 23</code>，灯号 <code>0–28</code>。不在本次音箱中转实测范围内。",
+  "verified_popu_link": "查看 PopuPiano 协议 →",
+  "verified_sequence": "初始化与小包发送规则",
+  "verified_step1": "输出端口打开后，用设备类型字节 <code>7F</code> 进入调色板模式；琴键颜色帧仍用 <code>05</code>。",
+  "verified_step2": "8 ms 后清灯，再等 120 ms 稳定，然后查询并恢复当前目标。这是控制器时序，不是物理亮灯延迟测量。",
+  "verified_step3": "每包最多 <strong>3 个音符/颜色对</strong>（16 字节 SysEx），包间至少 <strong>8 ms</strong>。MidiBrowser 的 256 字节上限不代表音箱中转可以发大包。",
+  "verified_step4": "Web MIDI 发送原始 SysEx，不加 BLE 时间戳。每包发送成功后重新计算差分，换和弦或暂停时取消尚未发送的旧目标。",
+  "verified_routing_title": "地址路由、重连与弹奏安全",
+  "verified_route": "先识别并选择输出，只接收与它无歧义配对的输入回报。CMD <code>02</code> 学习通道与地址；未知时向该总线用 <code>7F/7F</code> 广播，不把 <code>3F</code> 写死。",
+  "verified_events": "CMD <code>04/05</code> 触发防抖重查；CMD <code>18</code> 更新八度路由。不重置用户八度，不把查询无回报当成断开。",
+  "verified_lifecycle": "暂停/停止要清灯；重连先初始化、清灯，再恢复当前目标。退出时取消定时器，不关闭宿主 App 共享的 MIDI/BLE 连接。",
+  "verified_input": "禁止用 Note On 亮灯。保留原有弹奏解析、力度、通道、running status 与 CC64。屏幕、判定和灯光共用实际 MIDI 音符，超范围不能偷偷移调。",
+  "verified_audio": "不要全局静音。若另行实现音箱声音路由，仅在可靠确认音箱在线后静音网页钢琴，保留音效和 BGM。键盘 CMD <code>05</code> 不是音箱在线证据。",
+  "verified_reuse": "其他项目如何直接复用",
+  "verified_reuse_body": "压缩包包含完整 Skill、三个无运行时依赖的 ESM 模块和测试。模块保持在同一目录，接入已有 Web MIDI 与输入回调；蓝牙配对仍由宿主 App 负责。",
+  "verified_capability": "部分注入桥没有 <code>sysexEnabled</code> 属性。辅助函数允许已成功的 <code>{sysex:true}</code> 请求，除非返回对象明确拒绝；仅普通 MIDI 回退成功不代表允许亮灯。能力不足时保留弹奏计分，并提示“亮灯暂不可用”。",
+  "verified_check": "执行 <code>node --test skills/partykeys-protocol/scripts/lighting.test.mjs skills/partykeys-protocol/scripts/routing.test.mjs</code>，再跑目标项目自身检查。最后在目标硬件验收真实琴键、快速换和弦与重连。",
+  "verified_legacy_scope": "以下快速示例与 SDK 仅适用于已验证的直连 RGB 设备。Web MIDI / 大音箱中转请先采用上方<a href=\"#verified-lighting\">已验证 palette71 规则</a>，不要混用初始化模式。",
+  "verified_palette_scope": "以下保留历史直连示例：<code>3F</code> 是设备地址，不是通用目标；12 对大包及暗色/白色槽位需验证目标固件。不能照搬到音箱中转，那里应使用发现的路由和每包最多 3 对。",
+  "verified_latency_title": "物理延迟需要实测。",
+  "verified_latency": "旧直连设备的估计是 150–250 ms，并非大音箱链路的测量值。不要强制给音频增加 200 ms 延迟，也不要把初始化的 120 ms 稳定时间当作灯光延迟。",
+  "verified_faq1": "依次检查 SysEx 能力、已选配对输出、对应模式初始化、小包与发送间隔、发现的地址路由。能收到弹奏不代表亮灯输出可用。<a href=\"#verified-lighting\">查看已验证规则。</a>"
+});
+
 const LANG_HTML = { en: 'en', zh: 'zh-CN', ja: 'ja', ko: 'ko', es: 'es', fr: 'fr', de: 'de', pt: 'pt-BR' };
 
 function setLang(lang) {
@@ -1825,7 +2017,8 @@ function setLang(lang) {
   const dict = i18n[lang];
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (dict[key] !== undefined) el.innerHTML = dict[key];
+    const value = dict[key] ?? i18n.en[key];
+    if (value !== undefined) el.innerHTML = value;
   });
   const sel = document.getElementById('lang-select');
   if (sel && sel.value !== lang) sel.value = lang;
@@ -1874,7 +2067,7 @@ function attachCopy(btn) {
 document.querySelectorAll('.copy-btn, #copy-llm-prompt').forEach(attachCopy);
 
 // Active sidebar link on scroll
-const sections = ['introduction','quickstart','protocol','sdk','ai','faq']
+const sections = ['introduction','verified-lighting','quickstart','protocol','sdk','ai','faq']
   .map(id => document.getElementById(id)).filter(Boolean);
 const sidebarLinks = document.querySelectorAll('.sidebar-link');
 function updateActive() {

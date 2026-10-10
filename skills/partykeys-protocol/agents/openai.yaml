@@ -1,0 +1,4 @@
+interface:
+  display_name: "音乐密码亮灯接入"
+  short_description: "复用切切乐已验证的琴键亮灯，支持 Web MIDI 与大音箱中转"
+  default_prompt: "用 $partykeys-protocol，按和弦切切乐已验证方案给当前项目接入琴键亮灯，保留现有弹奏与连接逻辑，并验证协议、快速切换和重连恢复。"
