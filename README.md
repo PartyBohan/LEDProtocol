@@ -1,6 +1,11 @@
 # PartyKeys Protocol documentation
 
-Live site: https://protocol.partykeys.ai/
+Live site for this repository: https://protocol.partykeys.org/
+
+The matching https://protocol.partykeys.ai/ site uses the independent
+`protocol-ai` Vercel project connected to `PartyBohan/partykeys-org`.
+Keep the published lighting rules and Skill assets in sync between the two
+repositories; publishing this repository alone does not update the `.ai` domain.
 
 `index.html` and `developers.html` are intentionally identical entry points.
 The site is static and uses the existing GitHub → Vercel production integration.

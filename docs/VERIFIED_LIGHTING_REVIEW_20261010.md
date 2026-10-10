@@ -2,7 +2,8 @@
 
 ## Scope and evidence
 
-- Site: https://protocol.partykeys.ai/
+- Site for this repository: https://protocol.partykeys.org/, Vercel project `led-protocol`.
+- Requested mirror: https://protocol.partykeys.ai/, Vercel project `protocol-ai`, connected to `PartyBohan/partykeys-org`. Vercel's domain and Git settings confirmed that the `.ai` site deploys independently; its baseline `fe4df7431cf6635a64223d98c7230961b5b744c5` contained the identical page. The same rules and Skill assets were synchronized to that repository without reassigning domains.
 - Repository: https://github.com/PartyBohan/LEDProtocol
 - Baseline: `cda96ff2d886be6caa5078d663f2243c6d751b82`; the fetched live home page matched the baseline file before changes.
 - Profile: `fruit-webmidi-palette71-v1`, based on the user's confirmation of the PartyKeys ChordCut hardware chain.
